@@ -1,69 +1,67 @@
 #include <iostream>
 #include <memory>
 #include <thread>
+#include <chrono>
 
 #include <boost/program_options.hpp>
 
 #include <indiemotion/server.hpp>
-#include <indiemotion/session.hpp>
-#include <indiemotion/logging.hpp>
 
 using namespace indiemotion;
 namespace progopts = boost::program_options;
 
+struct ContextDelegate: public SessionDelegate, SceneDelegate, MotionDelegate
+{
+	long _last_time;
+	int running_frame_count = 0;
+	int current_frame_count = 60;
 
-struct DebugApp: public Application {
+	ContextDelegate(): _last_time(std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1000000) {}
 
-	logging::Logger logger;
-
-	DebugApp() {
-    	logger = logging::get_logger("com.indiemotion.idmserver");
+	void session_updated(Context ctx) override
+	{
 	}
 
-	std::vector<Camera> cameras {
-        Camera("camera1"),
-        Camera("camera2"),
-        Camera("camera3"),
-    };
-
-    std::optional<Camera> active_camera;
-
-    std::vector<Camera> get_available_cameras() override {
-        return cameras;
-    }
-
-    std::optional<Camera> get_camera_by_name(std::string name) override {
-        for (auto &cam: cameras)
-        {
-            if (cam.name == name) {
-                return cam;
-            }
-        }
-        return {};
-    }
-
-    void did_set_active_camera(Camera camera) override {
-        logger->info("Active Camera Updated: {}", camera.name);
-		active_camera = camera;
-
-    }
-    void did_set_motion_mode(MotionMode m) override {
-        logger->info("Motion Mode Did Update: {}", m);
-    }
-    void did_receive_motion_update(MotionXForm m) override {
-		logger->info("MotionXForm: {}", m.description());
+	void scene_updated(Context ctx) override
+	{
 	}
 
-    void will_shutdown_session() override {
-        logger->info("Session is shutting down");
-    }
-    void will_start_session() override {
-        logger->info("Session is starting");
-    }
-    void did_start_session() override {
-        logger->info("Session is started");
-    }
+	void motion_updated(Context ctx) override
+	{
+		std::cout << "motion_update:"
+			<< " sps: " << poll()
+			<< " tx: " << ctx.motion.current_xform.translation.x
+			<< " ty: " << ctx.motion.current_xform.translation.y
+			<< " tz: " << ctx.motion.current_xform.translation.z
+			<< std::endl;
+	}
+
+	std::vector<Camera> get_scene_cameras() override
+	{
+		return std::vector<Camera>{
+			Camera("cam1"),
+			Camera("cam2")
+		};
+	}
+
+	void on_shutdown(Context ctx) override
+	{
+	}
+
+	int poll()
+	{
+		auto time = std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1000000;
+		if ((time - _last_time) >= 1000) {
+			_last_time = std::move(time);
+			current_frame_count = running_frame_count;
+			running_frame_count = 0;
+		}
+		running_frame_count += 1;
+		return current_frame_count;
+	}
+
 };
+
 
 /**
  * Command Line Options
@@ -111,17 +109,26 @@ int main(int argc, const char **argv) {
         << "see the docs for more information.\n\n"
         << "Starting Server: 0.0.0.0:" << options->port << "\n\n";
 
-    ServerOptions server_options;
+	auto delegate = std::make_shared<ContextDelegate>();
+	DelegateInfo delegate_info;
+	delegate_info.session = delegate;
+	delegate_info.scene = delegate;
+	delegate_info.motion = delegate;
+
+    Options server_options;
     server_options.address = "0.0.0.0";
     server_options.port = options->port;
+	server_options.delegate_info = delegate_info;
+	server_options.disconnect_behavior = DisconnectBehavior::RestartAlways;
 
-    auto server = Server(server_options);
+	server_options.on_connect = [&]() {};
+	server_options.on_disconnect = [&]() {};
+
+    auto server = std::make_shared<Server>(server_options);
     std::thread thread{[&server]() {
-        server.start([](std::shared_ptr<Session> controller) {
-            auto delegate = std::make_shared<DebugApp>();
-			controller->set_application(std::move(delegate));
-        });
+        server->start();
     }};
+
     thread.join();
     return 0;
 }

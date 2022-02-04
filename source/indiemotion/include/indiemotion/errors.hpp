@@ -50,7 +50,7 @@ namespace indiemotion
 	struct UnknownFatalException : Exception
 	{
 		UnknownFatalException() : Exception("UnknownError",
-			"Session encountered an unknown fatal error, shutting down.",
+			"SessionCon encountered an unknown fatal error, shutting down.",
 			true)
 		{
 		};
@@ -131,7 +131,7 @@ namespace indiemotion
 
 	/**
 	 * An Exception that is thrown when an operation on a session cannot happen because the
-	 * Session needs to be initialized.
+	 * SessionCon needs to be initialized.
 	 *
 	 * IndieMotion Error: SessionNotInitializedError
 	 *
@@ -139,7 +139,7 @@ namespace indiemotion
 	struct SessionNotInitializedException : Exception
 	{
 		SessionNotInitializedException() : Exception("SessionNotInitializedError",
-			"Session must be initialized.")
+			"SessionCon must be initialized.")
 		{
 		};
 	};
@@ -165,37 +165,9 @@ namespace indiemotion
 	 */
 	struct CameraNotFoundException : Exception
 	{
-		CameraNotFoundException(std::string camera_id) : Exception("CameraNotFoundError",
-			"could not find camera with matching id: "
-				+ camera_id)
-		{
-		}
-	};
-
-	/**
-	 * An Exception that is thrown when a session property with a given name could not be found.
-	 *
-	 * IndieMotion Error: SessionPropertyNotFoundError
-	 */
-	struct SessionPropertyNotFoundException: Exception
-	{
-		SessionPropertyNotFoundException(std::string name) : Exception("SessionPropertyNotFoundError",
-			"no property with that name: " + name)
-		{
-
-		}
-	};
-
-	/**
-	 * An exception that is thrown when there is a problem with a session property's type.
-	 *
-	 * IndieMotion Error: SessionPropertyTypeError
-	 *
-	 */
-	struct SessionPropertyTypeException: Exception
-	{
-		SessionPropertyTypeException(std::string message) : Exception("SessionPropertyTypeError",
-			message)
+		CameraNotFoundException(std::string camera_name) : Exception("CameraNotFoundError",
+			"could not find camera with matching name: "
+				+ camera_name)
 		{
 		}
 	};
