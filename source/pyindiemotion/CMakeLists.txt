@@ -8,7 +8,7 @@ set(CMAKE_SHARED_MODULE_PREFIX "")
 
 # Add a shared module - modules are intended to be imported at runtime.
 # - This is where you add the source files
-add_library(pyindiemotion MODULE hello_ext.cpp)
+add_library(pyindiemotion MODULE pyindiemotion.cpp)
 set_target_properties(pyindiemotion PROPERTIES OUTPUT_NAME "indiemotion")
 
 # Set up the libraries and header search paths for this target
