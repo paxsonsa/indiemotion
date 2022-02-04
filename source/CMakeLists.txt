@@ -3,6 +3,7 @@
 
 add_subdirectory(indiemotionpb)
 add_subdirectory(indiemotion)
+add_subdirectory(pyindiemotion)
 
 if(${${PROJECT_NAME}_BUILD_CLI})
     message("Enabled CLI")
