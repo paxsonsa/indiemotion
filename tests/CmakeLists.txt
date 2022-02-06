@@ -36,11 +36,8 @@ foreach(item ${TEST_FILES})
             #this will automatically setup the needed flags and dependencies when linking against this target
         PRIVATE # The following libraries are only linked for this target, and its flags/dependencies will not be used when linking against this target
             indiemotion
-
             rapidjson
             doctest::doctest
-            #debug DEBUGLIBS
-            #optimized RELEASELIBS
     )
     message("adding ${name}")
     add_test(
@@ -51,3 +48,10 @@ foreach(item ${TEST_FILES})
     # target_set_warnings(${name} DISABLE deprecated-declarations)
     target_set_warnings(${name} ENABLE pedantic unused DISABLE deprecated-declarations)
 endforeach()
+
+# Add Python Module Testing
+add_test (NAME pyindiemotion
+          COMMAND ${Python_EXECUTABLE} -m unittest
+          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+set_tests_properties(pyindiemotion
+        PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib:$ENV{PYTHONPATH}")

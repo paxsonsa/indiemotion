@@ -8,5 +8,15 @@ namespace indiemotion
 
 		Camera(std::string name): name(name)
 		{}
+
+		bool operator==(const Camera& other) const
+		{
+			return (name == other.name);
+		}
+
+		bool operator!=(const Camera& other) const
+		{
+			return !(name == other.name);
+		}
 	};
 }

@@ -1,6 +1,4 @@
 # Find python and Boost - both are required dependencies
-find_package(Python COMPONENTS Development)
-find_package(Boost COMPONENTS python REQUIRED)
 message("PYTHON: ${Python_LIBRARIES} ${Python_INCLUDE_DIRS}")
 
 # Without this, any build libraries automatically have names "lib{x}.so"

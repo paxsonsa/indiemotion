@@ -66,13 +66,15 @@ option(${PROJECT_NAME}_BUILD_CLI "Enable/Disable the debugging CLI tools" ON)
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-find_package(Boost 1.75.0 REQUIRED program_options)
+find_package(Boost 1.75.0 REQUIRED program_options python)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
 
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
+
+find_package(Python 3.9 COMPONENTS Development Interpreter)
 
 # -----------------------------------------------------------------------------
 # Libraries and Executables
