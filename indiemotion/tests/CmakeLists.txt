@@ -1,4 +1,13 @@
-file(GLOB TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/indiemotion/*.cpp)
+function(MakeTestWithPath NAME PATH)
+    add_executable(${NAME} ${PATH})
+    target_include_directories(${NAME} PUBLIC
+            $<BUILD_INTERFACE>
+        )
+
+endmacro()
+
+
+
 foreach(item ${TEST_FILES})
     get_filename_component(name ${item} NAME_WE)
     add_executable(${name} ${item})
@@ -29,7 +38,7 @@ file(GLOB TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/indiemotion/**/*.cpp)
 foreach(item ${TEST_FILES})
     get_filename_component(name ${item} NAME_WE)
     add_executable(${name} ${item})
-    target_include_directories(${name} PUBLIC include ${CMAKE_CURRENT_BINARY_DIR}/include)
+    target_include_directories(${name} PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/include)
     target_link_libraries(${name}
         #PUBLIC # Useful for libraries, see https://cmake.org/cmake/help/latest/manual/cmake-buildsystem.7.html for more details about transitive usage requirements.
             #libraries/targets to link when linking this library
@@ -48,10 +57,3 @@ foreach(item ${TEST_FILES})
     # target_set_warnings(${name} DISABLE deprecated-declarations)
     target_set_warnings(${name} ENABLE pedantic unused DISABLE deprecated-declarations)
 endforeach()
-
-# Add Python Module Testing
-add_test (NAME pyindiemotion
-          COMMAND ${Python_EXECUTABLE} -m unittest
-          WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
-set_tests_properties(pyindiemotion
-        PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_BINARY_DIR}/lib:$ENV{PYTHONPATH}")

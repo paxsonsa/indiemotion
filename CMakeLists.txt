@@ -15,7 +15,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
 endif()
 
 project(
-    "IndieMotion"
+    "indiemotion"
     VERSION 1.0.0
     LANGUAGES C CXX
 )
@@ -30,10 +30,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Do not enable compiler specific language extensions.
 set(CMAKE_CXX_EXTENSIONS OFF)
-
-# Share Output Locations
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin CACHE INTERNAL "" FORCE)
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib CACHE INTERNAL "" FORCE)
 
 # -----------------------------------------------------------------------------
 #  Modules and scripts
@@ -61,12 +57,20 @@ cmake_dependent_option(${PROJECT_NAME}_BUILD_TESTS
     "BUILD_TESTING" OFF # Stay coherent with CTest variables
 )
 
+option(${PROJECT_NAME}_BUILD_PYTHON
+    "Build the python shared modules" ON # By default we want tests if CTest is enabled
+)
+
 option(${PROJECT_NAME}_BUILD_CLI "Enable/Disable the debugging CLI tools" ON)
+
+# Enable Testing before generating sources to ensure the tests in the submodules are found
+set(TEST_RUNNER_PARAMS "--force-colors=false" CACHE STRING "Options to add to our test runners commands")
+enable_testing()
 
 # -----------------------------------------------------------------------------
 # Dependencies
 # -----------------------------------------------------------------------------
-find_package(Boost 1.75.0 REQUIRED program_options python)
+find_package(Boost 1.76.0 REQUIRED program_options)
 if(Boost_FOUND)
     include_directories(${Boost_INCLUDE_DIRS})
 endif()
@@ -74,25 +78,24 @@ endif()
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 
-find_package(Python 3.9 COMPONENTS Development Interpreter)
-
 # -----------------------------------------------------------------------------
 # Libraries and Executables
 # -----------------------------------------------------------------------------
-add_subdirectory(source)
+add_subdirectory(indiemotionpb)
+add_subdirectory(indiemotion)
+
+if (${PROJECT_NAME}_BUILD_PYTHON)
+    add_subdirectory(indiemotion-python)
+endif()
+
+if(${${PROJECT_NAME}_BUILD_CLI})
+    message("Enabled CLI")
+    add_subdirectory(idmserver)
+endif()
+
+
+
 if (EXISTS "${CMAKE_SOURCE_DIR}/private")
   add_subdirectory(private)
 endif()
 add_subdirectory(external EXCLUDE_FROM_ALL)
-# add_subdirectory(tests)
-
-# -----------------------------------------------------------------------------
-# Testing
-# -----------------------------------------------------------------------------
-# if((CMAKE_PROJECT_NAME STREQUAL IndieMotion OR INDIEMOTION_BUILD_TESTING) AND BUILD_TESTING)
-# Let the user add options to the test runner if needed
-  set(TEST_RUNNER_PARAMS "--force-colors=false" CACHE STRING "Options to add to our test runners commands")
-  enable_testing()
-  add_subdirectory(tests)
-
-# endif()

@@ -1,18 +1,17 @@
 import unittest
 import indiemotion
 
-
 class TestSceneContext(unittest.TestCase):
     def test_active_camera(self):
 
-        ctx = indiemotion.SceneContext()
+        ctx = indiemotion.context.SceneContext()
         self.assertEqual(ctx.active_camera, None)
 
         ctx.active_camera = "cam1"
         self.assertEqual(ctx.active_camera, "cam1")
 
     def test_cameras(self):
-        ctx = indiemotion.SceneContext()
+        ctx = indiemotion.context.SceneContext()
         self.assertEqual(ctx.cameras, [])
         ctx.cameras.append(
             indiemotion.Camera("cam1")
@@ -28,14 +27,14 @@ class TestSceneContext(unittest.TestCase):
 class TestMotionContext(unittest.TestCase):
 
     def test_motion_status(self):
-        ctx = indiemotion.MotionContext()
+        ctx = indiemotion.context.MotionContext()
         self.assertEqual(ctx.status, indiemotion.motion_status.idle)
 
         ctx.status = indiemotion.motion_status.live
         self.assertEqual(ctx.status, indiemotion.motion_status.live)
 
     def test_motion_xform(self):
-        ctx = indiemotion.MotionContext()
+        ctx = indiemotion.context.MotionContext()
         self.assertEqual(ctx.current_xform.translation, indiemotion.Vector3())
         self.assertEqual(ctx.current_xform.orientation, indiemotion.Vector3())
 
