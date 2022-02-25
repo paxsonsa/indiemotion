@@ -19,12 +19,12 @@ be used to finalize your apps setup.
 
 At this point the session is considered active.
 
-## Camera Setup
+## SceneCamera Setup
 A session cannot begin recording until it has set an active camera. You should expect the following members 
 to be invoked immediately following the startup process:
 
 `get_available_cameras` will be called almost immediately, the user cannot select a camera until it knows
-what is available. The `Camera` structure itself is very simple for right now, only consisting of an name/id.
+what is available. The `SceneCamera` structure itself is very simple for right now, only consisting of an name/id.
 The vector of cameras returned will be passed to the client.
 
 `get_camera_by_name` will be the next member invoked. This called is invoked when the client selects a camera

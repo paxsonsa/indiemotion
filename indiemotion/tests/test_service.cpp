@@ -14,28 +14,28 @@ struct DummyDelegate : public SessionDelegate, SceneDelegate, MotionDelegate
 	bool on_shutdown_called = false;
 	bool get_scene_cameras_called = false;
 
-	std::vector<Camera> get_scene_cameras() override
+	std::vector<SceneCamera> get_scene_cameras() override
 	{
 		get_scene_cameras_called = true;
-		return std::vector<Camera>
+		return std::vector<SceneCamera>
 		{
-			Camera{"cam1"},
-			Camera{"cam2"}
+			SceneCamera{ "cam1"},
+			SceneCamera{ "cam2"}
 		};
 	}
-	void scene_updated(Context ctx) override
+	void on_scene_updated(Context ctx) override
 	{
 		scene_ctx = ctx.scene;
 	}
-	void session_updated(Context ctx) override
+	void on_session_updated(Context ctx) override
 	{
 		session_ctx = ctx.session;
 	}
-	void motion_updated(Context ctx) override
+	void on_motion_updated(Context ctx) override
 	{
 		motion_ctx = ctx.motion;
 	}
-	void on_shutdown(Context ctx) override
+	void on_session_shutdown(Context ctx) override
 	{
 		on_shutdown_called = true;
 	}
@@ -260,7 +260,7 @@ TEST_SUITE("Basic Service Lifecycle")
 			REQUIRE(delegate->session_ctx.shutdown);
 		}
 
-		SUBCASE("the session context delegate's on_shutdown callback should be called")
+		SUBCASE("the session context delegate's on_session_shutdown callback should be called")
 		{
 			REQUIRE(delegate->on_shutdown_called);
 		}
@@ -275,10 +275,10 @@ SCENARIO("Making a message from SceneInfo")
 		auto ctx = SceneContext();
 		ctx.active_camera_name = "cam1";
 		ctx.cameras.push_back(
-			Camera("cam1")
+			SceneCamera("cam1")
 		);
 		ctx.cameras.push_back(
-			Camera("cam2")
+			SceneCamera("cam2")
 		);
 
 		WHEN("A message is generated from the context")

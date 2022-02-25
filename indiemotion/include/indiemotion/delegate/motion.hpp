@@ -5,6 +5,6 @@ namespace indiemotion
 {
 	struct MotionDelegate
 	{
-		virtual void motion_updated(Context ctx) {};
+		virtual void on_motion_updated(Context ctx) {};
 	};
 }

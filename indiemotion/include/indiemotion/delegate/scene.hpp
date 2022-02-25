@@ -5,7 +5,7 @@
 namespace indiemotion {
 	struct SceneDelegate
 	{
-		virtual std::vector<Camera> get_scene_cameras() = 0;
-		virtual void scene_updated(Context ctx) {};
+		virtual std::vector<SceneCamera> get_scene_cameras() = 0;
+		virtual void on_scene_updated(Context ctx) {};
 	};
 };

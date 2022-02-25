@@ -61,7 +61,7 @@ message InitializeSession
 message ShutdownSession {}
 
 /// Defines the data that makes up a camera
-message Camera {string name = 10;}
+message SceneCamera {string name = 10;}
 
 /// Defines the data that makes up a camera
 message ActiveCamera {string name = 10;}
@@ -70,7 +70,7 @@ message ActiveCamera {string name = 10;}
 /// This information can be cameras, objects, or coordinates.
 message SceneInfo {
   optional string active_camera_name = 10;
-  repeated Camera cameras = 20;
+  repeated SceneCamera cameras = 20;
 }
 
 /// Motion Data that is sent from the Input Device

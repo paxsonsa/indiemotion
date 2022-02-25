@@ -4,12 +4,13 @@
 
 namespace indiemotion
 {
-	struct MotionContext
+	struct MotionContext final
 	{
 		MotionStatus status;
 		MotionXForm current_xform;
 
-		static MotionContext create() {
+		static MotionContext create()
+		{
 			return MotionContext();
 		}
 	};

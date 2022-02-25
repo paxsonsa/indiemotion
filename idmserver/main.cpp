@@ -18,15 +18,15 @@ struct ContextDelegate: public SessionDelegate, SceneDelegate, MotionDelegate
 
 	ContextDelegate(): _last_time(std::chrono::high_resolution_clock::now().time_since_epoch().count() / 1000000) {}
 
-	void session_updated(Context ctx) override
+	void on_session_updated(Context ctx) override
 	{
 	}
 
-	void scene_updated(Context ctx) override
+	void on_scene_updated(Context ctx) override
 	{
 	}
 
-	void motion_updated(Context ctx) override
+	void on_motion_updated(Context ctx) override
 	{
 		std::cout << "motion_update:"
 			<< " sps: " << poll()
@@ -36,15 +36,15 @@ struct ContextDelegate: public SessionDelegate, SceneDelegate, MotionDelegate
 			<< std::endl;
 	}
 
-	std::vector<Camera> get_scene_cameras() override
+	std::vector<SceneCamera> get_scene_cameras() override
 	{
-		return std::vector<Camera>{
-			Camera("cam1"),
-			Camera("cam2")
+		return std::vector<SceneCamera>{
+			SceneCamera("cam1"),
+			SceneCamera("cam2")
 		};
 	}
 
-	void on_shutdown(Context ctx) override
+	void on_session_shutdown(Context ctx) override
 	{
 	}
 

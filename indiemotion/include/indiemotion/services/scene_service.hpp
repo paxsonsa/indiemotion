@@ -58,7 +58,7 @@ namespace indiemotion
 		{
 			if (_delegate)
 			{
-				_delegate->scene_updated(*_ctx);
+				_delegate->on_scene_updated(*_ctx);
 			}
 		}
 	};

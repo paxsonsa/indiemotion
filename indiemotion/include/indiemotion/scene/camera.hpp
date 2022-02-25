@@ -2,19 +2,19 @@
 
 namespace indiemotion
 {
-	struct Camera
+	struct SceneCamera
 	{
 		std::string name;
 
-		Camera(std::string name): name(name)
+		SceneCamera(std::string name): name(name)
 		{}
 
-		bool operator==(const Camera& other) const
+		bool operator==(const SceneCamera& other) const
 		{
 			return (name == other.name);
 		}
 
-		bool operator!=(const Camera& other) const
+		bool operator!=(const SceneCamera& other) const
 		{
 			return !(name == other.name);
 		}

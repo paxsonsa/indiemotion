@@ -3,10 +3,10 @@
 
 namespace indiemotion
 {
-	struct SceneContext
+	struct SceneContext final
 	{
 		std::optional<std::string> active_camera_name;
-		std::vector<Camera> cameras = {};
+		std::vector<SceneCamera> cameras = {};
 
 		static SceneContext create() {
 			return SceneContext();

@@ -44,7 +44,7 @@ namespace indiemotion
 			ctx->session.initialized = false;
 			if (_delegate)
 			{
-				_delegate->on_shutdown(*ctx);
+				_delegate->on_session_shutdown(*ctx);
 			}
 			update();
 		}
@@ -56,7 +56,7 @@ namespace indiemotion
 		{
 			if (_delegate)
 			{
-				_delegate->session_updated(*ctx);
+				_delegate->on_session_updated(*ctx);
 			}
 		}
 	};

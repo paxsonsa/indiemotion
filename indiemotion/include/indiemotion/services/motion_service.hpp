@@ -96,7 +96,7 @@ namespace indiemotion
 		{
 			if (_delegate)
 			{
-				_delegate->motion_updated(*_ctx);
+				_delegate->on_motion_updated(*_ctx);
 			}
 		}
 	};

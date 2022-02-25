@@ -1,72 +1,115 @@
-//
-// Created by Andrew Paxson on 2022-02-03.
-//
-#include <boost/python.hpp>
-#include <boost/python/suite/indexing/vector_indexing_suite.hpp>
-#include <indiemotion/context.hpp>
+#include "base.hpp"
+#include "converters.hpp"
+#include "delegate.hpp"
 
-using namespace indiemotion;
-namespace py = boost::python;
+struct TestDummy {};
 
-char const* greet()
+void validate_scene_delegate(indiemotion::Context ctx, python::object obj)
 {
-	return "hello, world";
+	if (python::hasattr(obj, "get_scene_cameras"))
+	{
+		python::object cb = obj.attr("get_scene_cameras");
+		python::object result = cb();
+
+		// Test None Type
+		python::list cameras = python::extract<python::list>(result);
+		std::cout << "cameras: " << len(cameras) << std::endl;
+		python::stl_input_iterator<indiemotion::SceneCamera> begin(cameras), end;
+		for (auto it = begin; it != end; ++it)
+		{
+			it->name;
+		}
+	}
+	if (python::hasattr(obj, "on_scene_updated"))
+	{
+		python::object cb = obj.attr("on_scene_updated");
+		cb(ctx);
+	}
 }
 
-struct _PySceneContextWrapper
+void validate_motion_delegate(indiemotion::Context ctx, python::object obj)
 {
-	std::optional<std::string> active_camera_name;
-	py::list cameras;
-};
+	if (python::hasattr(obj, "on_motion_updated"))
+	{
+		python::object cb = obj.attr("on_motion_updated");
+		cb(ctx);
+	}
+}
+
+void validate_session_delegate(indiemotion::Context ctx, python::object obj)
+{
+	if (python::hasattr(obj, "on_session_startup"))
+	{
+		std::cout << "\ncalled...\n" << std::endl;
+		python::object cb = obj.attr("on_session_startup");
+		cb(ctx);
+	}
+
+	if (python::hasattr(obj, "on_session_startup"))
+	{
+		python::object cb = obj.attr("on_session_startup");
+		cb(ctx);
+	}
+	if (python::hasattr(obj, "on_session_updated"))
+	{
+		python::object cb = obj.attr("on_session_updated");
+		cb(ctx);
+	}
+	if (python::hasattr(obj, "on_session_shutdown"))
+	{
+		python::object cb = obj.attr("on_session_shutdown");
+		cb(ctx);
+	}
+	if (python::hasattr(obj, "should_session_shutdown"))
+	{
+		python::object cb = obj.attr("should_session_shutdown");
+		cb(ctx);
+	}
+}
+
 
 BOOST_PYTHON_MODULE (indiemotion)
 {
 	// Optional std::string Conversions
-	py::to_python_converter<std::optional<std::string>,
+	python::to_python_converter<std::optional<std::string>,
 							to_python_optional<std::string> >();
 	from_python_optional<std::string>();
 
-	py::class_<SessionContext>("SessionContext")
-		.def_readwrite("name", &SessionContext::name)
-		.def_readwrite("initialized", &SessionContext::initialized)
-		.def_readwrite("shutdown", &SessionContext::shutdown);
+	python::enum_<indiemotion::MotionStatus>("motion_status")
+		.value("idle", indiemotion::MotionStatus::Idle)
+		.value("live", indiemotion::MotionStatus::Live)
+		.value("recording", indiemotion::MotionStatus::Recording);
 
-	py::enum_<MotionStatus>("motion_status")
-		.value("idle", MotionStatus::Idle)
-		.value("live", MotionStatus::Live)
-		.value("recording", MotionStatus::Recording);
+	python::class_<indiemotion::Vector3>("Vector3")
+		.def_readwrite("x", &idm::Vector3::x)
+		.def_readwrite("y", &idm::Vector3::y)
+		.def_readwrite("z", &idm::Vector3::z)
+		.def("__eq__", &idm::Vector3::operator==);
 
-	py::class_<Vector3>("Vector3")
-		.def_readwrite("x", &Vector3::x)
-		.def_readwrite("y", &Vector3::y)
-		.def_readwrite("z", &Vector3::z)
-		.def("__eq__", &Vector3::operator==);
+	python::class_<indiemotion::MotionXForm>("MotionXForm")
+		.def_readwrite("translation", &idm::MotionXForm::translation)
+		.def_readwrite("orientation", &idm::MotionXForm::orientation);
 
-	py::class_<MotionXForm>("MotionXForm")
-		.def_readwrite("translation", &MotionXForm::translation)
-		.def_readwrite("orientation", &MotionXForm::orientation);
+	python::class_<indiemotion::MotionContext>("MotionContext", python::init<>())
+		.def_readwrite("status", &indiemotion::MotionContext::status)
+		.def_readwrite("current_xform", &indiemotion::MotionContext::current_xform);
 
-	py::class_<MotionContext>("MotionContext")
-		.def_readwrite("status", &MotionContext::status)
-		.def_readwrite("current_xform", &MotionContext::current_xform);
+	python::class_<idm::SceneContext>("SceneContext", python::init<>());
 
-	py::class_<Camera>("Camera", py::init<std::string>())
-		.def_readwrite("name", &Camera::name)
-		.def("__eq__", &Camera::operator==)
-		.def("__ne__", &Camera::operator!=);
+	python::class_<idm::SessionContext>("SessionContext", python::init<>());
 
-	py::class_<_PySceneContextWrapper>("SceneContext")
-		.add_property("active_camera",
-			py::make_getter(&_PySceneContextWrapper::active_camera_name,
-								  py::return_value_policy<py::return_by_value>()),
-			py::make_setter(&_PySceneContextWrapper::active_camera_name,
-				                  py::return_value_policy<py::return_by_value>())
-		)
-//		("active_camera_name", &SceneContext::active_camera_name)
-			// https://stackoverflow.com/questions/36485840/wrap-boostoptional-using-boostpython
-			// https://misspent.wordpress.com/2009/09/27/how-to-write-boost-python-converters/
+	python::class_<idm::Context>("Context", python::init<>());
 
-		.def_readwrite("cameras", &_PySceneContextWrapper::cameras);
+	python::class_<idm::SceneCamera>("SceneCamera", python::init<std::string>())
+		.def_readwrite("name", &idm::SceneCamera::name, "The display name of the camera");
 
-	py::def("greet", greet);
+
+
+	/*
+	 * Testing Tools for clients.
+	 */
+	python::scope test = python::class_<TestDummy>("test");
+	python::def("validate_scene_delegate", validate_scene_delegate, "test delegate implementation in C++ context");
+	python::def("validate_motion_delegate", validate_motion_delegate, "test delegate implementation in C++ context");
+	python::def("validate_session_delegate", validate_session_delegate, "test delegate implementation in C++ context");
 }

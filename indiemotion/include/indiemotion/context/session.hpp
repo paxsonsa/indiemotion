@@ -2,7 +2,7 @@
 
 namespace indiemotion
 {
-	struct SessionContext
+	struct SessionContext final
 	{
 		std::string name = "";
 		bool initialized = false;
