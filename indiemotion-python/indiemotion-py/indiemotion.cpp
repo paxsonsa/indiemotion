@@ -40,7 +40,6 @@ void validate_session_delegate(indiemotion::Context ctx, python::object obj)
 {
 	if (python::hasattr(obj, "on_session_startup"))
 	{
-		std::cout << "\ncalled...\n" << std::endl;
 		python::object cb = obj.attr("on_session_startup");
 		cb(ctx);
 	}
