@@ -36,7 +36,7 @@ struct ContextDelegate: public SessionDelegate, SceneDelegate, MotionDelegate
 			<< std::endl;
 	}
 
-	std::vector<SceneCamera> get_scene_cameras() override
+	std::vector<SceneCamera> get_scene_cameras(Context ctx) override
 	{
 		return std::vector<SceneCamera>{
 			SceneCamera("cam1"),

@@ -14,7 +14,7 @@ struct DummyDelegate : public SessionDelegate, SceneDelegate, MotionDelegate
 	bool on_shutdown_called = false;
 	bool get_scene_cameras_called = false;
 
-	std::vector<SceneCamera> get_scene_cameras() override
+	std::vector<SceneCamera> get_scene_cameras(Context ctx) override
 	{
 		get_scene_cameras_called = true;
 		return std::vector<SceneCamera>

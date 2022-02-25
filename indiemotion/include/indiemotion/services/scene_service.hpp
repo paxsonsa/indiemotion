@@ -32,7 +32,7 @@ namespace indiemotion
 		void load_cameras() const
 		{
 			if (_delegate)
-				_ctx->scene.cameras = _delegate->get_scene_cameras();
+				_ctx->scene.cameras = _delegate->get_scene_cameras(*_ctx);
 		}
 
 		void update_active_camera(std::optional<std::string> name)
