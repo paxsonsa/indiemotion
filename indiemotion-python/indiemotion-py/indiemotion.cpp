@@ -6,64 +6,25 @@ struct TestDummy {};
 
 void validate_scene_delegate(indiemotion::Context ctx, python::object obj)
 {
-	if (python::hasattr(obj, "get_scene_cameras"))
-	{
-		python::object cb = obj.attr("get_scene_cameras");
-		python::object result = cb();
 
-		// Test None Type
-		python::list cameras = python::extract<python::list>(result);
-		std::cout << "cameras: " << len(cameras) << std::endl;
-		python::stl_input_iterator<indiemotion::SceneCamera> begin(cameras), end;
-		for (auto it = begin; it != end; ++it)
-		{
-			it->name;
-		}
-	}
-	if (python::hasattr(obj, "on_scene_updated"))
-	{
-		python::object cb = obj.attr("on_scene_updated");
-		cb(ctx);
-	}
+	auto delegate = PyDelegateWrapper(obj);
+	delegate.get_scene_cameras(ctx);
+	delegate.on_scene_updated(ctx);
 }
 
 void validate_motion_delegate(indiemotion::Context ctx, python::object obj)
 {
-	if (python::hasattr(obj, "on_motion_updated"))
-	{
-		python::object cb = obj.attr("on_motion_updated");
-		cb(ctx);
-	}
+	auto delegate = PyDelegateWrapper(obj);
+	delegate.on_motion_updated(ctx);
 }
 
 void validate_session_delegate(indiemotion::Context ctx, python::object obj)
 {
-	if (python::hasattr(obj, "on_session_startup"))
-	{
-		python::object cb = obj.attr("on_session_startup");
-		cb(ctx);
-	}
-
-	if (python::hasattr(obj, "on_session_startup"))
-	{
-		python::object cb = obj.attr("on_session_startup");
-		cb(ctx);
-	}
-	if (python::hasattr(obj, "on_session_updated"))
-	{
-		python::object cb = obj.attr("on_session_updated");
-		cb(ctx);
-	}
-	if (python::hasattr(obj, "on_session_shutdown"))
-	{
-		python::object cb = obj.attr("on_session_shutdown");
-		cb(ctx);
-	}
-	if (python::hasattr(obj, "should_session_shutdown"))
-	{
-		python::object cb = obj.attr("should_session_shutdown");
-		cb(ctx);
-	}
+	auto delegate = PyDelegateWrapper(obj);
+	delegate.on_session_startup(ctx);
+	delegate.on_session_updated(ctx);
+	delegate.on_session_shutdown(ctx);
+	delegate.should_session_shutdown(ctx);
 }
 
 
@@ -101,8 +62,6 @@ BOOST_PYTHON_MODULE (indiemotion)
 
 	python::class_<idm::SceneCamera>("SceneCamera", python::init<std::string>())
 		.def_readwrite("name", &idm::SceneCamera::name, "The display name of the camera");
-
-
 
 	/*
 	 * Testing Tools for clients.

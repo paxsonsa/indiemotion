@@ -11,7 +11,16 @@ namespace boost::python {
 		return PyObject_HasAttrString(o.ptr(), name);
 	}
 }
-
 namespace python = boost::python;
 
-
+struct PyGILLock
+{
+	PyGILState_STATE gstate;
+	PyGILLock()
+	{
+		gstate = PyGILState_Ensure();
+	}
+	~PyGILLock() {
+		PyGILState_Release(gstate);
+	}
+};

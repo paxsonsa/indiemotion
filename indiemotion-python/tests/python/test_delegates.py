@@ -13,7 +13,7 @@ class DelegateSpy:
         self.on_scene_updated_called = True
 
     get_scene_cameras_called = False
-    def get_scene_cameras(self):
+    def get_scene_cameras(self, ctx):
         self.get_scene_cameras_called = True
         return [
             indiemotion.SceneCamera("cam1")
@@ -53,7 +53,7 @@ class TestDelegateClasses(unittest.TestCase):
         self.delegate.on_scene_updated(ctx)
         self.assertTrue(self.delegate.on_scene_updated_called)
 
-        self.delegate.get_scene_cameras()
+        self.delegate.get_scene_cameras(ctx)
         self.assertTrue(self.delegate.get_scene_cameras_called)
 
 
