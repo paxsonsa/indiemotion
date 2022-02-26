@@ -1,6 +1,14 @@
 #pragma once
 #include "base.hpp"
 
+/**
+ * Returns method on the python object or the default function given
+ * @tparam T The return type for the function (can be implied)
+ * @param name The name of the method (attribute) to look up on the python object
+ * @param obj The python object to check
+ * @param super The default function to return.
+ * @return A function with the expected return value.
+ */
 template <typename T>
 std::function<T(indiemotion::Context)> get_func_or_super(const char * name, python::object obj, std::function<T(indiemotion::Context)> super)
 {
@@ -12,12 +20,21 @@ std::function<T(indiemotion::Context)> get_func_or_super(const char * name, pyth
 	return super;
 }
 
+/**
+ * A wrapper for working with Python objects as the delegate items for the session.
+ */
 struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDelegate, indiemotion::MotionDelegate
 {
 	python::object _session_delegate;
 	python::object _scene_delegate;
 	python::object _motion_delegate;
 
+	/**
+	 * Constructor where each delegate is a seperate object.
+	 * @param session_delegate
+	 * @param scene_delegate
+	 * @param motion_delegate
+	 */
 	PyDelegateWrapper(python::object session_delegate, python::object scene_delegate, python::object motion_delegate) :
 		_session_delegate(session_delegate),
 		_scene_delegate(scene_delegate),
@@ -25,6 +42,10 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 	{
 	}
 
+	/**
+	 * Construct a delegate wrapper using one object for all the delegate types.
+	 * @param delegate
+	 */
 	PyDelegateWrapper(python::object delegate) :
 		_session_delegate(delegate),
 		_scene_delegate(delegate),
@@ -84,6 +105,9 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 		auto py_func = _scene_delegate.attr("get_scene_cameras");
 		python::object result = py_func(ctx);
+
+		// Extract the python list from the function call and construct a new std::vector
+		// from the list.
 		python::list items = python::extract<python::list>(result);
 		python::stl_input_iterator<indiemotion::SceneCamera> begin(items), end;
 		return std::vector<indiemotion::SceneCamera>(begin, end);
