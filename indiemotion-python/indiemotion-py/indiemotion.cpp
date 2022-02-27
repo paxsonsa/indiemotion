@@ -1,6 +1,7 @@
 #include "base.hpp"
 #include "converters.hpp"
 #include "delegate.hpp"
+#include "server.hpp"
 
 struct TestDummy {};
 
@@ -62,6 +63,11 @@ BOOST_PYTHON_MODULE (indiemotion)
 
 	python::class_<idm::SceneCamera>("SceneCamera", python::init<std::string>())
 		.def_readwrite("name", &idm::SceneCamera::name, "The display name of the camera");
+
+	python::class_<PyServer, boost::noncopyable>("Server", python::init<python::object>())
+	    .def("start", &PyServer::start)
+		.def("wait", &PyServer::wait)
+		.def("start_blocking", &PyServer::start_blocking);
 
 	/*
 	 * Testing Tools for clients.

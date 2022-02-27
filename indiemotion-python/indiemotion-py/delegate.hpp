@@ -55,7 +55,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	void on_session_startup(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		std::function<void(indiemotion::Context)> super = std::bind(&SessionDelegate::on_session_startup, this, std::placeholders::_1);
 		auto func = get_func_or_super("on_session_startup", _session_delegate, super);
 		func(ctx);
@@ -63,7 +63,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	void on_session_updated(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		std::function<void(indiemotion::Context)> super = std::bind(&SessionDelegate::on_session_updated, this, std::placeholders::_1);
 		auto func = get_func_or_super("on_session_updated", _session_delegate, super);
 		func(ctx);
@@ -71,7 +71,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	void on_session_shutdown(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		std::function<void(indiemotion::Context)> super = std::bind(&SessionDelegate::on_session_shutdown, this, std::placeholders::_1);
 		auto func = get_func_or_super("on_session_shutdown", _session_delegate, super);
 		std::cout << "on_session_shutdown() here" << std::endl;
@@ -80,7 +80,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	bool should_session_shutdown(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		std::function<bool(indiemotion::Context)> super = std::bind(&SessionDelegate::should_session_shutdown, this, std::placeholders::_1);
 		auto func = get_func_or_super("should_session_shutdown", _session_delegate, super);
 		return func(ctx);
@@ -88,7 +88,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	void on_motion_updated(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		std::function<void(indiemotion::Context)> super = std::bind(&MotionDelegate::on_motion_updated, this, std::placeholders::_1);
 		auto func = get_func_or_super("on_motion_updated", _motion_delegate, super);
 		return func(ctx);
@@ -96,7 +96,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	std::vector<indiemotion::SceneCamera> get_scene_cameras(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		if (!python::hasattr(_scene_delegate, "get_scene_cameras"))
 		{
 			PyErr_Format(PyExc_AttributeError, "missing expected method 'get_scene_cameras'");
@@ -115,7 +115,7 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	void on_scene_updated(indiemotion::Context ctx) override
 	{
-		PyGILLock gil;
+		GILLock gil;
 		std::function<void(indiemotion::Context)> super = std::bind(&SceneDelegate::on_scene_updated, this, std::placeholders::_1);
 		auto func = get_func_or_super("on_scene_updated", _motion_delegate, super);
 		return func(ctx);

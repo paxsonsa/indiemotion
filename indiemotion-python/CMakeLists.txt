@@ -11,13 +11,10 @@ find_package(Boost 1.76 COMPONENTS python)
 
 add_library(indiemotion-py MODULE
     indiemotion-py/base.hpp
-    indiemotion-py/context.hpp
-    indiemotion-py/context.cpp
-    indiemotion-py/delegate.cpp
     indiemotion-py/delegate.hpp
     indiemotion-py/converters.hpp
     indiemotion-py/indiemotion.cpp
-)
+        indiemotion-py/server.hpp)
 add_library(indiemotion::python ALIAS indiemotion-py)
 
 set_target_properties(indiemotion-py PROPERTIES OUTPUT_NAME "indiemotion")

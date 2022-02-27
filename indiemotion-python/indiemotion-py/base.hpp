@@ -13,14 +13,26 @@ namespace boost::python {
 }
 namespace python = boost::python;
 
-struct PyGILLock
+struct GILLock
 {
 	PyGILState_STATE gstate;
-	PyGILLock()
+	GILLock()
 	{
 		gstate = PyGILState_Ensure();
 	}
-	~PyGILLock() {
+	~GILLock() {
 		PyGILState_Release(gstate);
+	}
+};
+
+struct GILRelease
+{
+	PyThreadState *_save;;
+	GILRelease()
+	{
+		_save = PyEval_SaveThread();
+	}
+	~GILRelease() {
+		PyEval_RestoreThread(_save);
 	}
 };
