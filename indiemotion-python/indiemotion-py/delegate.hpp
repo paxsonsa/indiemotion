@@ -9,8 +9,10 @@
  * @param super The default function to return.
  * @return A function with the expected return value.
  */
-template <typename T>
-std::function<T(indiemotion::Context)> get_func_or_super(const char * name, python::object const &obj, std::function<T(indiemotion::Context)> super)
+template<typename T>
+std::function<T(indiemotion::Context)> get_func_or_super(const char* name,
+	python::object const& obj,
+	std::function<T(indiemotion::Context)> super)
 {
 	if (python::hasattr(obj, name))
 	{
@@ -20,8 +22,8 @@ std::function<T(indiemotion::Context)> get_func_or_super(const char * name, pyth
 	return super;
 }
 
-template <typename T>
-std::function<T(void)> get_func_or_super(const char * name, python::object const &obj, std::function<T(void)> super)
+template<typename T>
+std::function<T(void)> get_func_or_super(const char* name, python::object const& obj, std::function<T(void)> super)
 {
 	if (python::hasattr(obj, name))
 	{
@@ -31,7 +33,7 @@ std::function<T(void)> get_func_or_super(const char * name, python::object const
 	return super;
 }
 
-template <typename T>
+template<typename T>
 std::function<T(void)> get_method(python::object const& obj, const char* name, std::function<T(void)> default_method)
 {
 	if (python::hasattr(obj, name))
@@ -42,8 +44,10 @@ std::function<T(void)> get_method(python::object const& obj, const char* name, s
 	return default_method;
 }
 
-template <typename T>
-std::function<T(indiemotion::Context)> get_method(python::object const& obj, const char* name, std::function<T(indiemotion::Context)> default_method)
+template<typename T>
+std::function<T(indiemotion::Context)> get_method(python::object const& obj,
+	const char* name,
+	std::function<T(indiemotion::Context)> default_method)
 {
 	if (python::hasattr(obj, name))
 	{
@@ -56,11 +60,10 @@ std::function<T(indiemotion::Context)> get_method(python::object const& obj, con
 /**
  * A wrapper for working with Python objects as the delegate items for the session.
  */
-struct PyDelegateWrapper : public
-	indiemotion::ServerDelegate,
-	indiemotion::SceneDelegate,
-	indiemotion::SessionDelegate,
-	indiemotion::MotionDelegate
+struct PyDelegateWrapper : public indiemotion::ServerDelegate,
+						   indiemotion::SceneDelegate,
+						   indiemotion::SessionDelegate,
+						   indiemotion::MotionDelegate
 {
 	python::object _py_delegate;
 	indiemotion::logging::Logger _logger;
@@ -77,9 +80,12 @@ struct PyDelegateWrapper : public
 
 	bool should_server_shutdown() override
 	{
+#if defined INDIEMOTION_DETAILED_TRACE
 		indiemotion::logging::log_trace_scope _("python-delegate::should_server_shutdown");
+#endif
 		GILLock gil;
-		std::function<bool()> default_m = [](){ return false; };
+		std::function<bool()> default_m = []()
+		{ return false; };
 		return get_method(_py_delegate, "should_server_shutdown", default_m)();
 	}
 
@@ -87,7 +93,8 @@ struct PyDelegateWrapper : public
 	{
 		indiemotion::logging::log_trace_scope _("python-delegate::on_server_start");
 		GILLock gil;
-		std::function<void()> default_m = [](){};
+		std::function<void()> default_m = []()
+		{};
 		return get_method(_py_delegate, "on_server_start", default_m)();
 	}
 
@@ -95,7 +102,8 @@ struct PyDelegateWrapper : public
 	{
 		indiemotion::logging::log_trace_scope _("python-delegate::on_server_shutdown");
 		GILLock gil;
-		std::function<void()> default_m = [](){};
+		std::function<void()> default_m = []()
+		{};
 		return get_method(_py_delegate, "on_server_shutdown", default_m)();
 	}
 
@@ -103,7 +111,8 @@ struct PyDelegateWrapper : public
 	{
 		indiemotion::logging::log_trace_scope _("python-delegate::on_session_startup");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx)
+		{};
 		return get_method(_py_delegate, "on_session_startup", default_m)(ctx);
 	}
 
@@ -111,7 +120,8 @@ struct PyDelegateWrapper : public
 	{
 		indiemotion::logging::log_trace_scope _("python-delegate::on_session_updated");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx)
+		{};
 		return get_method(_py_delegate, "on_session_updated", default_m)(ctx);
 	}
 
@@ -119,15 +129,19 @@ struct PyDelegateWrapper : public
 	{
 		indiemotion::logging::log_trace_scope _("python-delegate::on_session_shutdown");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx)
+		{};
 		return get_method(_py_delegate, "on_session_shutdown", default_m)(ctx);
 	}
 
 	bool should_session_shutdown(indiemotion::Context ctx) override
 	{
+#if defined INDIEMOTION_DETAILED_TRACE
 		indiemotion::logging::log_trace_scope _("python-delegate::should_session_shutdown");
+#endif
 		GILLock gil;
-		std::function<bool()> default_m = [](){ return false; };
+		std::function<bool()> default_m = []()
+		{ return false; };
 		return get_method(_py_delegate, "should_session_shutdown", default_m)();
 	}
 
@@ -135,7 +149,8 @@ struct PyDelegateWrapper : public
 	{
 		indiemotion::logging::log_trace_scope _("python-delegate::on_motion_updated");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx)
+		{};
 		return get_method(_py_delegate, "on_motion_updated", default_m)(ctx);
 	}
 
@@ -161,9 +176,12 @@ struct PyDelegateWrapper : public
 
 	void on_scene_updated(indiemotion::Context ctx) override
 	{
+#if defined INDIEMOTION_DETAILED_TRACE
 		indiemotion::logging::log_trace_scope _("python-delegate::on_scene_updated");
+#endif
 		GILLock gil;
-		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx)
+		{};
 		return get_method(_py_delegate, "on_scene_updated", default_m)(ctx);
 	}
 };
