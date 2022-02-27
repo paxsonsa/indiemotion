@@ -60,26 +60,19 @@ namespace indiemotion::logging
 
     void init_logging()
     {
-		configure_default_logger("root");
+		configure_default_logger("indiemotion");
     }
 
-    Logger get_logger(std::string name)
+    Logger get_logger()
     {
-        for (auto loggerName : _list_parent_names(name))
-        {
-            auto logger = spdlog::get(loggerName);
-            if (logger)
-                return logger;
-        }
-
-        auto logger = spdlog::get("root");
+        auto logger = spdlog::get("indiemotion");
         if (logger)
         {
             return logger;
         }
 
         init_logging();
-        return spdlog::get("root");
+        return spdlog::get("indiemotion");
     }
 
     std::vector<std::string> _list_parent_names(std::string name)
@@ -106,4 +99,19 @@ namespace indiemotion::logging
         std::reverse(names.begin(), names.end());
         return names;
     }
+
+	struct log_trace_scope
+	{
+		std::string message;
+
+		log_trace_scope(std::string m): message(m) {
+			get_logger()->trace(message + ":::in");
+		}
+
+		~log_trace_scope() {
+			get_logger()->trace(message + ":::out");
+		}
+
+	};
+
 } // namespace indiemotion

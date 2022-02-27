@@ -20,7 +20,7 @@ namespace indiemotion
 		Service(std::shared_ptr<NetMessageDispatcher> dispatcher_ptr): ctx(std::make_shared<Context>())
 		{
 			_dispatcher = std::move(dispatcher_ptr);
-			_logger = logging::get_logger("com.indiemotion.sessionservice");
+			_logger = logging::get_logger();
 
 			/// Initialize the callback table
 			_m_callback_table[Message::PayloadCase::kInitializeSession] =

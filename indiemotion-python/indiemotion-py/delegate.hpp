@@ -10,7 +10,7 @@
  * @return A function with the expected return value.
  */
 template <typename T>
-std::function<T(indiemotion::Context)> get_func_or_super(const char * name, python::object obj, std::function<T(indiemotion::Context)> super)
+std::function<T(indiemotion::Context)> get_func_or_super(const char * name, python::object const &obj, std::function<T(indiemotion::Context)> super)
 {
 	if (python::hasattr(obj, name))
 	{
@@ -20,90 +20,136 @@ std::function<T(indiemotion::Context)> get_func_or_super(const char * name, pyth
 	return super;
 }
 
+template <typename T>
+std::function<T(void)> get_func_or_super(const char * name, python::object const &obj, std::function<T(void)> super)
+{
+	if (python::hasattr(obj, name))
+	{
+		auto func = obj.attr(name);
+		return func;
+	}
+	return super;
+}
+
+template <typename T>
+std::function<T(void)> get_method(python::object const& obj, const char* name, std::function<T(void)> default_method)
+{
+	if (python::hasattr(obj, name))
+	{
+		auto method = obj.attr(name);
+		return method;
+	}
+	return default_method;
+}
+
+template <typename T>
+std::function<T(indiemotion::Context)> get_method(python::object const& obj, const char* name, std::function<T(indiemotion::Context)> default_method)
+{
+	if (python::hasattr(obj, name))
+	{
+		auto method = obj.attr(name);
+		return method;
+	}
+	return default_method;
+}
+
 /**
  * A wrapper for working with Python objects as the delegate items for the session.
  */
-struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDelegate, indiemotion::MotionDelegate
+struct PyDelegateWrapper : public
+	indiemotion::ServerDelegate,
+	indiemotion::SceneDelegate,
+	indiemotion::SessionDelegate,
+	indiemotion::MotionDelegate
 {
-	python::object _session_delegate;
-	python::object _scene_delegate;
-	python::object _motion_delegate;
-
-	/**
-	 * Constructor where each delegate is a seperate object.
-	 * @param session_delegate
-	 * @param scene_delegate
-	 * @param motion_delegate
-	 */
-	PyDelegateWrapper(python::object session_delegate, python::object scene_delegate, python::object motion_delegate) :
-		_session_delegate(session_delegate),
-		_scene_delegate(scene_delegate),
-		_motion_delegate(motion_delegate)
-	{
-	}
+	python::object _py_delegate;
+	indiemotion::logging::Logger _logger;
 
 	/**
 	 * Construct a delegate wrapper using one object for all the delegate types.
 	 * @param delegate
 	 */
 	PyDelegateWrapper(python::object delegate) :
-		_session_delegate(delegate),
-		_scene_delegate(delegate),
-		_motion_delegate(delegate)
+		_py_delegate(delegate)
 	{
+		_logger = indiemotion::logging::get_logger();
+	}
+
+	bool should_server_shutdown() override
+	{
+		indiemotion::logging::log_trace_scope _("python-delegate::should_server_shutdown");
+		GILLock gil;
+		std::function<bool()> default_m = [](){ return false; };
+		return get_method(_py_delegate, "should_server_shutdown", default_m)();
+	}
+
+	void on_server_start() override
+	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_server_start");
+		GILLock gil;
+		std::function<void()> default_m = [](){};
+		return get_method(_py_delegate, "on_server_start", default_m)();
+	}
+
+	void on_server_shutdown() override
+	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_server_shutdown");
+		GILLock gil;
+		std::function<void()> default_m = [](){};
+		return get_method(_py_delegate, "on_server_shutdown", default_m)();
 	}
 
 	void on_session_startup(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_session_startup");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> super = std::bind(&SessionDelegate::on_session_startup, this, std::placeholders::_1);
-		auto func = get_func_or_super("on_session_startup", _session_delegate, super);
-		func(ctx);
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		return get_method(_py_delegate, "on_session_startup", default_m)(ctx);
 	}
 
 	void on_session_updated(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_session_updated");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> super = std::bind(&SessionDelegate::on_session_updated, this, std::placeholders::_1);
-		auto func = get_func_or_super("on_session_updated", _session_delegate, super);
-		func(ctx);
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		return get_method(_py_delegate, "on_session_updated", default_m)(ctx);
 	}
 
 	void on_session_shutdown(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_session_shutdown");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> super = std::bind(&SessionDelegate::on_session_shutdown, this, std::placeholders::_1);
-		auto func = get_func_or_super("on_session_shutdown", _session_delegate, super);
-		std::cout << "on_session_shutdown() here" << std::endl;
-		func(ctx);
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		return get_method(_py_delegate, "on_session_shutdown", default_m)(ctx);
 	}
 
 	bool should_session_shutdown(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::should_session_shutdown");
 		GILLock gil;
-		std::function<bool(indiemotion::Context)> super = std::bind(&SessionDelegate::should_session_shutdown, this, std::placeholders::_1);
-		auto func = get_func_or_super("should_session_shutdown", _session_delegate, super);
-		return func(ctx);
+		std::function<bool()> default_m = [](){ return false; };
+		return get_method(_py_delegate, "should_session_shutdown", default_m)();
 	}
 
 	void on_motion_updated(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_motion_updated");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> super = std::bind(&MotionDelegate::on_motion_updated, this, std::placeholders::_1);
-		auto func = get_func_or_super("on_motion_updated", _motion_delegate, super);
-		return func(ctx);
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		return get_method(_py_delegate, "on_motion_updated", default_m)(ctx);
 	}
 
 	std::vector<indiemotion::SceneCamera> get_scene_cameras(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::get_scene_cameras");
 		GILLock gil;
-		if (!python::hasattr(_scene_delegate, "get_scene_cameras"))
+		if (!python::hasattr(_py_delegate, "get_scene_cameras"))
 		{
 			PyErr_Format(PyExc_AttributeError, "missing expected method 'get_scene_cameras'");
 			throw indiemotion::ApplicationException("application scene delegate is misconfigured.", true);
 		}
 
-		auto py_func = _scene_delegate.attr("get_scene_cameras");
+		auto py_func = _py_delegate.attr("get_scene_cameras");
 		python::object result = py_func(ctx);
 
 		// Extract the python list from the function call and construct a new std::vector
@@ -115,9 +161,9 @@ struct PyDelegateWrapper : indiemotion::SceneDelegate, indiemotion::SessionDeleg
 
 	void on_scene_updated(indiemotion::Context ctx) override
 	{
+		indiemotion::logging::log_trace_scope _("python-delegate::on_scene_updated");
 		GILLock gil;
-		std::function<void(indiemotion::Context)> super = std::bind(&SceneDelegate::on_scene_updated, this, std::placeholders::_1);
-		auto func = get_func_or_super("on_scene_updated", _motion_delegate, super);
-		return func(ctx);
+		std::function<void(indiemotion::Context)> default_m = [](auto ctx){};
+		return get_method(_py_delegate, "on_scene_updated", default_m)(ctx);
 	}
 };

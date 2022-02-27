@@ -31,6 +31,8 @@ void validate_session_delegate(indiemotion::Context ctx, python::object obj)
 
 BOOST_PYTHON_MODULE (indiemotion)
 {
+	indiemotion::logging::init_logging();
+
 	// Optional std::string Conversions
 	python::to_python_converter<std::optional<std::string>,
 							to_python_optional<std::string> >();

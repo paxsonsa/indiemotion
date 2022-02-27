@@ -17,6 +17,7 @@ namespace indiemotion
 		Options _options;
 		tcp::acceptor _acceptor;
 		logging::Logger _logger;
+		asio::deadline_timer _shutdown_timer;
 		bool _stopped = false;
 
 	public:
@@ -25,9 +26,9 @@ namespace indiemotion
 		 * @param options
 		 */
 		Server(Options options)
-			: _options(std::move(options)), _acceptor(_io_context)
+			: _options(std::move(options)), _acceptor(_io_context), _shutdown_timer(_io_context)
 		{
-			_logger = logging::get_logger("com.indiemotion.server.Server");
+			_logger = logging::get_logger();
 		};
 
 		/**
@@ -46,6 +47,7 @@ namespace indiemotion
 				asio::execution::outstanding_work.tracked);
 
 			init_listen();
+			init_poll();
 
 			switch (_options.disconnect_behavior)
 			{
@@ -66,9 +68,33 @@ namespace indiemotion
 				_io_context.run();
 				break;
 			}
+
 			_logger->info("server shutting down.");
+			_options.delegate_info.server->on_server_shutdown();
+			_logger->info("server shutdown.");
 		}
 
+		/**
+		 * Returns whether the server is stopped.
+		 * @return
+		 */
+		bool stopped()
+		{
+			return _stopped;
+		}
+
+		/**
+		 * Stop the current server loop. Multiple calls do nothing.
+		 */
+		void stop()
+		{
+			if (!stopped()) {
+				_stopped = true;
+				_io_context.stop();
+			}
+		}
+
+	private:
 		void init_listen()
 		{
 			_logger->trace("Server::init_listen()");
@@ -111,19 +137,9 @@ namespace indiemotion
 			}
 		}
 
-		void stop()
-		{
-			_stopped = true;
-			_io_context.stop();
-		}
-
-	private:
-		/**
-         * Start listening and accepting connections.
-         * @param callbacks A set of callbacks that will be invoked during a connections lifecycle.
-         */
 		void listen() {
-			_logger->trace("Server::listen()");
+			_logger->info("Server starting");
+			_options.delegate_info.server->on_server_start();
 			_acceptor.async_accept(
 				asio::make_strand(_io_context),
 				beast::bind_front_handler(
@@ -133,12 +149,6 @@ namespace indiemotion
 			);
 		}
 
-		/**
-		* Handle when the async accept is invoked.
-		* @param callbacks
-		* @param ec
-		* @param socket
-		*/
 		void on_accept(beast::error_code ec, tcp::socket socket) {
 			_logger->trace("on_accept()");
 			if (ec) {
@@ -149,6 +159,29 @@ namespace indiemotion
 				std::make_shared<Connection>(_io_context, std::move(socket), _options)->start();
 			}
 			_logger->trace("exit on_accept()");
+		}
+
+		void check_poll(const boost::system::error_code& error)
+		{
+			indiemotion::logging::log_trace_scope _("indiemotion::Server::check_poll");
+			if (error || stopped())
+				return;
+
+			if (_options.delegate_info.server->should_server_shutdown())
+			{
+				stop();
+				return;
+			}
+
+			_shutdown_timer.expires_from_now(boost::posix_time::seconds(1));
+			_shutdown_timer.async_wait(std::bind(&Server::check_poll, this, std::placeholders::_1));
+
+		}
+
+		void init_poll()
+		{
+			auto ec = boost::system::error_code();
+			check_poll(ec);
 		}
 
 	};

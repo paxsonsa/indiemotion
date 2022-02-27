@@ -27,7 +27,7 @@ struct GILLock
 
 struct GILRelease
 {
-	PyThreadState *_save;;
+	PyThreadState *_save;
 	GILRelease()
 	{
 		_save = PyEval_SaveThread();

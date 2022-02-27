@@ -1,8 +1,6 @@
-print("hello")
-import sys
-print(sys.path)
 import os
-print(os.environ)
+import unittest
+
 import indiemotion
 
 class SimpleDelegate:
@@ -46,12 +44,14 @@ class SimpleDelegate:
         return False
 
 
-def main():
-    delegate = SimpleDelegate()
-    server = indiemotion.Server(delegate)
-    server.start_blocking()
+class ServerTesting(unittest.TestCase):
 
+    # @unittest.skipUnless(os.environ.get("INDIEMOTION_TEST_SERVER"), "requires $INDIEMOTION_TEST_SERVER to be set")
+    def test_server_integration(self):
+        print(os.environ)
+        delegate = SimpleDelegate()
+        server = indiemotion.Server(delegate)
+        server.start_blocking()
 
-if __name__ == "__main__":
-    print(sys.executable)
-    main()
+if __name__ == '__main__':
+    unittest.main()

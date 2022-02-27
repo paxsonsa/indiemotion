@@ -22,7 +22,7 @@ namespace indiemotion
 	class Connection : public std::enable_shared_from_this<Connection>
 	{
 	private:
-		logging::Logger _logger = logging::get_logger("com.indiemotion.server.connection");
+		logging::Logger _logger = logging::get_logger();
 		asio::io_context& _io_context; // Not used but important to keep alive.
 		websocket::stream<beast::tcp_stream> _websocket;
 		beast::flat_buffer _read_buffer;

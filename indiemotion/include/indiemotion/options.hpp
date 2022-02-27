@@ -13,9 +13,9 @@ namespace indiemotion
 		/// Terminate the server immediately
 		Terminate
 	};
-/**
- * A set of options to configure the server
- */
+	/**
+	 * A set of options to configure the server
+	 */
 	struct Options
 	{
 		/// An address to bind the interface to, defaults to 0.0.0.0
