@@ -1,7 +1,11 @@
-# TDOD Notes
+# TODO Notes
 - Python API
-  - How will we handle the threaded server and callbacks?
-  - https://pythonextensionpatterns.readthedocs.io/en/latest/thread_safety.html
+  - Example
+    - Handle Keyboard Signals 
+  - Error Handling
+    - Make sure to handle the errors from calling python functions.
+- Connection Delegate
+  - on_connection_start <-- pass in connection information
 - Handle Error Messages
 - InputDevice
   - Interaction from Controller to Service/InputDevice

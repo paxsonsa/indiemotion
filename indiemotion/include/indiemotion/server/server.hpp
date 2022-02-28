@@ -155,7 +155,6 @@ namespace indiemotion
 				_logger->error("encountered error accepting connection, continuing to listen: {}", ec.message());
 				listen();
 			} else {
-				_logger->info("accepting a connection");
 				std::make_shared<Connection>(_io_context, std::move(socket), _options)->start();
 			}
 			_logger->trace("exit on_accept()");
@@ -163,19 +162,18 @@ namespace indiemotion
 
 		void check_poll(const boost::system::error_code& error)
 		{
+#if defined INDIEMOTION_NOISY_TRACE
 			indiemotion::logging::log_trace_scope _("indiemotion::Server::check_poll");
+#endif
 			if (error || stopped())
 				return;
-
 			if (_options.delegate_info.server->should_server_shutdown())
 			{
 				stop();
 				return;
 			}
-
-			_shutdown_timer.expires_from_now(boost::posix_time::seconds(1));
+			_shutdown_timer.expires_from_now(boost::posix_time::milliseconds(100));
 			_shutdown_timer.async_wait(std::bind(&Server::check_poll, this, std::placeholders::_1));
-
 		}
 
 		void init_poll()

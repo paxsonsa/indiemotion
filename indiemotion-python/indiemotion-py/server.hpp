@@ -60,9 +60,6 @@ struct PyServer
 	void wait()
 	{
 		indiemotion::logging::log_trace_scope _("python-server::wait");
-
-		while (true) {}
-
 		bg_thread.join();
 		gil = nullptr;
 	}

@@ -29,6 +29,8 @@ namespace indiemotion
 		beast::flat_buffer _write_buffer;
 		std::unique_ptr<Service> _service;
 		Options _options;
+		asio::deadline_timer _shutdown_timer;
+		bool _disconnected = false;
 
 		/**
 		 * An internal helper structure that is used by the session bridge to
@@ -65,11 +67,13 @@ namespace indiemotion
 		 *
 		 * @param io_context This is the conext that all operations will be executed within.
 		 * @param socket The tcp socket to accept websocket communications on.
+		 * @param options The runtime options controlling the
 		 */
 		explicit Connection(asio::io_context& io_context, tcp::socket socket, Options options) :
 			_io_context(io_context),
 			_websocket(std::move(socket)),
-			_options(options)
+			_options(options),
+			_shutdown_timer(_io_context)
 		{
 		}
 
@@ -87,8 +91,9 @@ namespace indiemotion
 
 		void disconnect()
 		{
-			_options.on_disconnect();
+			_disconnected = true;
 			_io_context.stop();
+			_options.delegate_info.server->on_connection_close();
 		}
 
 	private:
@@ -134,7 +139,10 @@ namespace indiemotion
 				_logger->error(fmt::format("Connection::on_accept: {}", err.message()));
 				return;
 			}
-			_logger->info("Accepting Connection...");
+			_logger->trace("accepted connection...");
+			_options.delegate_info.server->on_connection_start();
+			init_poll();
+
 			auto dispatcher = std::make_shared<Dispatcher>([&](Message&& message)
 			{
 				auto os = beast::ostream(_write_buffer);
@@ -231,6 +239,28 @@ namespace indiemotion
 
 			// Do another read
 			do_read();
+		}
+
+		void check_poll(const boost::system::error_code& error)
+		{
+#if defined INDIEMOTION_NOISY_TRACE
+			indiemotion::logging::log_trace_scope _("indiemotion::Server::check_poll");
+#endif
+			if (error || _disconnected)
+				return;
+			if (_options.delegate_info.server->should_connection_close())
+			{
+				disconnect();
+				return;
+			}
+			_shutdown_timer.expires_from_now(boost::posix_time::milliseconds(100));
+			_shutdown_timer.async_wait(std::bind(&Connection::check_poll, this, std::placeholders::_1));
+		}
+
+		void init_poll()
+		{
+			auto ec = boost::system::error_code();
+			check_poll(ec);
 		}
 	};
 }
