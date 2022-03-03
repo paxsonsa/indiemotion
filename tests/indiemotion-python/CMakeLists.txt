@@ -1,36 +1,3 @@
-# Find python and Boost - both are required dependencies
-message("PYTHON: ${Python_LIBRARIES} ${Python_INCLUDE_DIRS}")
-
-# Find Python
-find_package(Python 3.9 COMPONENTS Development Interpreter)
-find_package(Boost 1.76 COMPONENTS python)
-
-# Build Package Skeleton
-#add_custom_target(pythondir ALL COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_BINARY_DIR}/python/indiemotion)
-#add_custom_target(pythonpkg ALL COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_BINARY_DIR}/python/indiemotion/__init__.py DEPENDS pythondir)
-
-add_library(indiemotion-py MODULE
-    indiemotion-py/base.hpp
-    indiemotion-py/delegate.hpp
-    indiemotion-py/converters.hpp
-    indiemotion-py/indiemotion.cpp
-        indiemotion-py/server.hpp)
-add_library(indiemotion::python ALIAS indiemotion-py)
-
-set_target_properties(indiemotion-py PROPERTIES OUTPUT_NAME "indiemotion")
-set_target_properties(indiemotion-py PROPERTIES PREFIX "")
-#set_target_properties(indiemotion-py PROPERTIES SUFFIX ".pyd")
-target_link_libraries(indiemotion-py PUBLIC Boost::python Python::Module Python::Python indiemotion)
-#add_dependencies(indiemotion-py pythonpkg)
-
-# Make sure .so files are copied into python package
-set_target_properties(indiemotion-py
-    PROPERTIES
-    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/python"
-    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/python"
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
-
 # Add Python Module Testing
 add_test(NAME test_indiemotion_python
          COMMAND ${Python_EXECUTABLE} -m unittest

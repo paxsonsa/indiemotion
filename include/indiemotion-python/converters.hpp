@@ -1,5 +1,5 @@
 #pragma once
-#include "base.hpp"
+#include <indiemotion-python/base.hpp>
 
 template<typename T>
 struct to_python_optional

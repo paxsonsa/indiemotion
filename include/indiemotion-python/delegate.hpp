@@ -1,5 +1,5 @@
 #pragma once
-#include "base.hpp"
+#include <indiemotion-python/base.hpp>
 
 /**
  * A wrapper for working with Python objects as the delegate items for the session.

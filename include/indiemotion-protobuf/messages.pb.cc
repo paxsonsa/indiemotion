@@ -48,12 +48,13 @@ static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_messages_2eproto[2]
 static constexpr ::PROTOBUF_NAMESPACE_ID::EnumDescriptor const** file_level_enum_descriptors_messages_2eproto = nullptr;
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_messages_2eproto = nullptr;
 
-const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+const uint32_t TableStruct_messages_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Header, _has_bits_),
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Header, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Header, id_),
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Header, responseid_),
   ~0u,
@@ -63,6 +64,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_messages_2eproto::offsets[] PR
   ~0u,  // no _extensions_
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Message, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Message, header_),
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
@@ -74,8 +76,8 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_messages_2eproto::offsets[] PR
   PROTOBUF_FIELD_OFFSET(::indiemotionpb::Message, payload_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 7, sizeof(::indiemotionpb::Header)},
-  { 9, -1, sizeof(::indiemotionpb::Message)},
+  { 0, 8, -1, sizeof(::indiemotionpb::Header)},
+  { 10, -1, -1, sizeof(::indiemotionpb::Message)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -143,11 +145,17 @@ Header::Header(const Header& from)
       _has_bits_(from._has_bits_) {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (!from._internal_id().empty()) {
     id_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_id(), 
       GetArenaForAllocation());
   }
   responseid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    responseid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
   if (from._internal_has_responseid()) {
     responseid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_responseid(), 
       GetArenaForAllocation());
@@ -157,7 +165,13 @@ Header::Header(const Header& from)
 
 inline void Header::SharedCtor() {
 id_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  id_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 responseid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  responseid_.Set(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), "", GetArenaForAllocation());
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 Header::~Header() {
@@ -185,7 +199,7 @@ void Header::SetCachedSize(int size) const {
 
 void Header::Clear() {
 // @@protoc_insertion_point(message_clear_start:indiemotionpb.Header)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -202,55 +216,57 @@ const char* Header::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::int
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   _Internal::HasBits has_bits{};
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // string id = 20;
       case 20:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 162)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 162)) {
           auto str = _internal_mutable_id();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "indiemotionpb.Header.id"));
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // optional string responseId = 40;
       case 40:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
           auto str = _internal_mutable_responseid();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
           CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "indiemotionpb.Header.responseId"));
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag == 0) || ((tag & 7) == 4)) {
-          CHK_(ptr);
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
+message_done:
   _has_bits_.Or(has_bits);
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Header::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Header::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:indiemotionpb.Header)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // string id = 20;
@@ -285,7 +301,7 @@ size_t Header::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:indiemotionpb.Header)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -304,13 +320,7 @@ size_t Header::ByteSizeLong() const {
         this->_internal_responseid());
   }
 
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Header::_class_data_ = {
@@ -319,8 +329,8 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Header::_class_data_ = {
 };
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Header::GetClassData() const { return &_class_data_; }
 
-void Header::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
-                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+void Header::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
   static_cast<Header *>(to)->MergeFrom(
       static_cast<const Header &>(from));
 }
@@ -329,7 +339,7 @@ void Header::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
 void Header::MergeFrom(const Header& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:indiemotionpb.Header)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (!from._internal_id().empty()) {
@@ -354,17 +364,19 @@ bool Header::IsInitialized() const {
 
 void Header::InternalSwap(Header* other) {
   using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   swap(_has_bits_[0], other->_has_bits_[0]);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &id_, GetArenaForAllocation(),
-      &other->id_, other->GetArenaForAllocation()
+      &id_, lhs_arena,
+      &other->id_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &responseid_, GetArenaForAllocation(),
-      &other->responseid_, other->GetArenaForAllocation()
+      &responseid_, lhs_arena,
+      &other->responseid_, rhs_arena
   );
 }
 
@@ -734,7 +746,7 @@ void Message::clear_payload() {
 
 void Message::Clear() {
 // @@protoc_insertion_point(message_clear_start:indiemotionpb.Message)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -749,92 +761,100 @@ void Message::Clear() {
 const char* Message::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
 #define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
   while (!ctx->Done(&ptr)) {
-    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    uint32_t tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
       // .indiemotionpb.Header header = 1;
       case 1:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
           ptr = ctx->ParseMessage(_internal_mutable_header(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.Error error = 25;
       case 25:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 202)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 202)) {
           ptr = ctx->ParseMessage(_internal_mutable_error(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.InitializeSession initialize_session = 31;
       case 31:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 250)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 250)) {
           ptr = ctx->ParseMessage(_internal_mutable_initialize_session(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.ShutdownSession shutdown_session = 32;
       case 32:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 2)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 2)) {
           ptr = ctx->ParseMessage(_internal_mutable_shutdown_session(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.SessionInfo session_info = 40;
       case 40:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 66)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 66)) {
           ptr = ctx->ParseMessage(_internal_mutable_session_info(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.SceneInfo scene_info = 50;
       case 50:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 146)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 146)) {
           ptr = ctx->ParseMessage(_internal_mutable_scene_info(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.ActiveCamera active_camera_updated = 51;
       case 51:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 154)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 154)) {
           ptr = ctx->ParseMessage(_internal_mutable_active_camera_updated(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
       // .indiemotionpb.payloads.MotionInfo motion_info = 60;
       case 60:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 226)) {
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 226)) {
           ptr = ctx->ParseMessage(_internal_mutable_motion_info(), ptr);
           CHK_(ptr);
-        } else goto handle_unusual;
+        } else
+          goto handle_unusual;
         continue;
-      default: {
-      handle_unusual:
-        if ((tag == 0) || ((tag & 7) == 4)) {
-          CHK_(ptr);
-          ctx->SetLastTag(tag);
-          goto success;
-        }
-        ptr = UnknownFieldParse(tag,
-            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
-            ptr, ctx);
-        CHK_(ptr != nullptr);
-        continue;
-      }
+      default:
+        goto handle_unusual;
     }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
   }  // while
-success:
+message_done:
   return ptr;
 failure:
   ptr = nullptr;
-  goto success;
+  goto message_done;
 #undef CHK_
 }
 
-::PROTOBUF_NAMESPACE_ID::uint8* Message::_InternalSerialize(
-    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+uint8_t* Message::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:indiemotionpb.Message)
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   // .indiemotionpb.Header header = 1;
@@ -913,7 +933,7 @@ size_t Message::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:indiemotionpb.Message)
   size_t total_size = 0;
 
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
@@ -978,13 +998,7 @@ size_t Message::ByteSizeLong() const {
       break;
     }
   }
-  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
-    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
-        _internal_metadata_, total_size, &_cached_size_);
-  }
-  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
+  return MaybeComputeUnknownFieldsSize(total_size, &_cached_size_);
 }
 
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Message::_class_data_ = {
@@ -993,8 +1007,8 @@ const ::PROTOBUF_NAMESPACE_ID::Message::ClassData Message::_class_data_ = {
 };
 const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*Message::GetClassData() const { return &_class_data_; }
 
-void Message::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
-                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+void Message::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message* to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message& from) {
   static_cast<Message *>(to)->MergeFrom(
       static_cast<const Message &>(from));
 }
@@ -1003,7 +1017,7 @@ void Message::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
 void Message::MergeFrom(const Message& from) {
 // @@protoc_insertion_point(class_specific_merge_from_start:indiemotionpb.Message)
   GOOGLE_DCHECK_NE(&from, this);
-  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
   if (from._internal_has_header()) {

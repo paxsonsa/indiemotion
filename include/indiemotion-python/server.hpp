@@ -1,6 +1,6 @@
 #pragma once
-#include "base.hpp"
-#include "delegate.hpp"
+#include <indiemotion-python/base.hpp>
+#include <indiemotion-python/delegate.hpp>
 
 struct PyServer
 {

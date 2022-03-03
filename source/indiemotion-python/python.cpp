@@ -1,7 +1,7 @@
-#include "base.hpp"
-#include "converters.hpp"
-#include "delegate.hpp"
-#include "server.hpp"
+#include <indiemotion-python/base.hpp>
+#include <indiemotion-python/converters.hpp>
+#include <indiemotion-python/delegate.hpp>
+#include <indiemotion-python/server.hpp>
 
 struct TestDummy {};
 

@@ -10,7 +10,7 @@ Indiemotion is conformant with the [VFX 2022 Reference](https://vfxplatform.com)
 | Library | Version | Included? |
 | ------------ | ------------- | ----------|
 boost | 1.76.0 | No
-protobuf3-cpp | 3.17.3 | No
+protobuf3-cpp | 3.19.x | No
 spdlog | 1.9.2 | yes |
 fmt | 8.0.1| yes |
 doctest | 2.4.6 | yes|

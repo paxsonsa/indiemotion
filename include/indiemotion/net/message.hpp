@@ -1,8 +1,8 @@
 #pragma once
 #include <indiemotion/errors.hpp>
 
-#include <indiemotionpb/messages.pb.h>
-#include <indiemotionpb/payloads.pb.h>
+#include <indiemotion-protobuf/messages.pb.h>
+#include <indiemotion-protobuf/payloads.pb.h>
 
 #include <boost/uuid/random_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
