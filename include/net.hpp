@@ -1,0 +1,8 @@
+//
+// Created by Andrew Paxson on 2022-05-19.
+//
+
+#ifndef INDIEMOTION_INCLUDE_NET_HPP
+#define INDIEMOTION_INCLUDE_NET_HPP
+
+#endif //INDIEMOTION_INCLUDE_NET_HPP
