@@ -57,6 +57,7 @@ include(CopyDllsForDebug)
 # -----------------------------------------------------------------------------
 # Find Core Packages
 # -----------------------------------------------------------------------------
+add_subdirectory(vendor)
 find_package(Boost 1.76.0 REQUIRED python program_options)
 
 add_library(indiemotion include/indiemotion/server.hpp)
@@ -70,6 +71,8 @@ target_link_libraries(indiemotion
         PUBLIC
         general
         Boost::boost
+        spdlog::spdlog
+        fmt::fmt
 )
 
 add_executable(imserver main.cpp)
