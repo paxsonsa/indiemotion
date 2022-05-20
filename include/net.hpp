@@ -1,8 +1,5 @@
-//
-// Created by Andrew Paxson on 2022-05-19.
-//
+#pragma once
+#include <boost/asio.hpp>
 
-#ifndef INDIEMOTION_INCLUDE_NET_HPP
-#define INDIEMOTION_INCLUDE_NET_HPP
-
-#endif //INDIEMOTION_INCLUDE_NET_HPP
+namespace net = boost::asio;                    // from <boost/asio.hpp>
+using tcp = boost::asio::ip::tcp;               // from <boost/asio/ip/tcp.hpp>

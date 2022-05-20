@@ -60,9 +60,14 @@ include(CopyDllsForDebug)
 add_subdirectory(vendor)
 find_package(Boost 1.76.0 REQUIRED python program_options)
 
-add_library(indiemotion include/indiemotion/server.hpp)
+add_library(indiemotion include/indiemotion/server.hpp src/server/server.cpp include/indiemotion/impl/server_runtime.hpp include/beast.hpp include/net.hpp src/server/server_runtime.cpp src/server/http_session.cpp src/server/http_session.hpp)
 add_library(indiemotion::indiemotion ALIAS indiemotion)
 set_target_properties(indiemotion PROPERTIES LINKER_LANGUAGE CXX)
+set_target_properties(indiemotion PROPERTIES
+        FRAMEWORK TRUE
+        FRAMEWORK_VERSION A # Version "A" is macOS convention
+        MACOSX_FRAMEWORK_IDENTIFIER com.andrewpaxson.indiemotion
+        )
 target_compile_features(indiemotion PUBLIC cxx_std_17)
 target_include_directories(indiemotion
         PUBLIC $<INSTALL_INTERFACE:${indiemotion_INSTALL_INCLUDEDIR}> $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -75,7 +80,7 @@ target_link_libraries(indiemotion
         fmt::fmt
 )
 
-add_executable(imserver main.cpp)
+add_executable(imserver src/imserver/main.cpp)
 target_link_libraries(imserver
         PUBLIC
         indiemotion

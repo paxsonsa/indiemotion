@@ -1,8 +1,7 @@
-//
-// Created by Andrew Paxson on 2022-05-19.
-//
+#pragma once
 
-#ifndef INDIEMOTION_INCLUDE_BEAST_HPP
-#define INDIEMOTION_INCLUDE_BEAST_HPP
+#include <boost/beast.hpp>
 
-#endif //INDIEMOTION_INCLUDE_BEAST_HPP
+namespace beast = boost::beast;                 // from <boost/beast.hpp>
+namespace http = beast::http;                   // from <boost/beast/http.hpp>
+namespace websocket = beast::websocket;         // from <boost/beast/websocket.hpp>
