@@ -17,6 +17,7 @@ namespace indiemotion
 		auto const endpoint = tcp::endpoint{ address, port};
 		_runtime->set_endpoint(endpoint);
 		_runtime->set_reuse_addr(true);
+		_runtime->set_root_path(c->root_path);
 		_runtime->start();
 	}
 

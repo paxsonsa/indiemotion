@@ -8,6 +8,7 @@ namespace indiemotion::internal {
 	class HttpSession: public std::enable_shared_from_this<HttpSession> {
 		beast::tcp_stream _stream;
 		beast::flat_buffer _buffer;
+		std::string const _doc_root;
 
 		// The parser is stored in an optional container so we can
 		// construct it from scratch it at the beginning of each new message.
@@ -21,8 +22,14 @@ namespace indiemotion::internal {
 		void _fail(beast::error_code ec, char const* what);
 
 	public:
-		HttpSession(tcp::socket&& socket);
+		HttpSession(tcp::socket&& socket, std::string root);
 
 		void run();
+
+		std::string const&
+		doc_root() const noexcept
+		{
+			return _doc_root;
+		}
 	};
 }

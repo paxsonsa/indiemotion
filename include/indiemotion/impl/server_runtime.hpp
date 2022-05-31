@@ -9,6 +9,7 @@ namespace indiemotion::internal {
 	private:
 		net::io_context _io_ctx;
 		tcp::acceptor _acceptor;
+		std::string _root;
 	public:
 		_ServerRuntime(): _acceptor(_io_ctx) {}
 		~_ServerRuntime() = default;
@@ -22,6 +23,7 @@ namespace indiemotion::internal {
 
 		void set_endpoint(const tcp::endpoint&);
 		void set_reuse_addr(bool);
+		void set_root_path(std::string);
 		void start();
 		void wait_until_exit();
 	private:

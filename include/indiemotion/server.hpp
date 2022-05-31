@@ -10,6 +10,7 @@ namespace indiemotion
 	struct ServerConfiguration {
 		std::string address;
 		unsigned short port;
+		std::string root_path;
 	};
 
 	class Server: public std::enable_shared_from_this<Server> {

@@ -33,6 +33,11 @@ namespace indiemotion::internal {
 		}
 	}
 
+	void _ServerRuntime::set_root_path(std::string path)
+	{
+		_root = std::move(path);
+	}
+
 	void _ServerRuntime::start()
 	{
 		// Build Runtime Threads
@@ -73,7 +78,7 @@ namespace indiemotion::internal {
 			fmt::print("failed while accepting connection...");
 		} else {
 			fmt::print("Accepting a new connection!");
-			std::make_shared<HttpSession>(std::move(socket))->run();
+			std::make_shared<HttpSession>(std::move(socket), _root)->run();
 		}
 		do_accept();
 	}
