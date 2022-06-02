@@ -1,10 +1,11 @@
+#include <memory>
 #include <fmt/core.h>
-#include <indiemotion/impl/server_runtime.hpp>
+#include <indiemotion/server_runtime.hpp>
 
 #include "http_session.hpp"
 
-namespace indiemotion::internal {
-	void _ServerRuntime::set_endpoint(const tcp::endpoint& endpoint)
+namespace indiemotion {
+	void ServerRuntime::set_endpoint(const tcp::endpoint& endpoint)
 	{
 		beast::error_code ec;
 		_acceptor.open(endpoint.protocol(), ec);
@@ -22,7 +23,7 @@ namespace indiemotion::internal {
 		}
 	}
 
-	void _ServerRuntime::set_reuse_addr(bool b)
+	void ServerRuntime::set_reuse_addr(bool b)
 	{
 		beast::error_code ec;
 		_acceptor.set_option(net::socket_base::reuse_address(b), ec);
@@ -33,15 +34,18 @@ namespace indiemotion::internal {
 		}
 	}
 
-	void _ServerRuntime::set_root_path(std::string path)
+	void ServerRuntime::set_root_path(std::string path)
 	{
 		_root = std::move(path);
 	}
 
-	void _ServerRuntime::start()
-	{
-		// Build Runtime Threads
+        void ServerRuntime::set_callbacks(std::shared_ptr<GlobalCallbacks> callbacks)
+        {
+            _callbacks = std::move(callbacks);
+        }
 
+	void ServerRuntime::start()
+	{
 		// Start listening for connections
 		beast::error_code ec;
 		_acceptor.listen(
@@ -56,29 +60,29 @@ namespace indiemotion::internal {
 		do_accept();
 	}
 
-	void _ServerRuntime::wait_until_exit()
+	void ServerRuntime::wait_until_exit()
 	{
 		_io_ctx.run();
 	}
 
 
-	void _ServerRuntime::do_accept()
+	void ServerRuntime::do_accept()
 	{
 		_acceptor.async_accept(
 			net::make_strand(_io_ctx),
 			beast::bind_front_handler(
-				&_ServerRuntime::on_accept,
+				&ServerRuntime::on_accept,
 				shared_from_this()
 			)
 		);
 	}
 
-	void _ServerRuntime::on_accept(beast::error_code ec, tcp::socket socket) {
+	void ServerRuntime::on_accept(beast::error_code ec, tcp::socket socket) {
 		if (ec) {
-			fmt::print("failed while accepting connection...");
+			fmt::print("failed while accepting connection...\n");
 		} else {
-			fmt::print("Accepting a new connection!");
-			std::make_shared<HttpSession>(std::move(socket), _root)->run();
+			fmt::print("Accepting a new connection!\n");
+			std::make_shared<internal::HttpSession>(std::move(socket), _root, _callbacks)->run();
 		}
 		do_accept();
 	}

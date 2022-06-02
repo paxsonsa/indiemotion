@@ -1,13 +1,13 @@
 #include <memory>
 #include <net.hpp>
 #include <indiemotion/server.hpp>
-#include <indiemotion/impl/server_runtime.hpp>
+#include <indiemotion/server_runtime.hpp>
 
 namespace indiemotion
 {
 
 	Server::Server() {
-		_runtime = std::make_shared<internal::_ServerRuntime>();
+		_runtime = std::make_shared<ServerRuntime>();
 	}
 
 	void Server::start(std::shared_ptr<ServerConfiguration> c)
@@ -18,6 +18,7 @@ namespace indiemotion
 		_runtime->set_endpoint(endpoint);
 		_runtime->set_reuse_addr(true);
 		_runtime->set_root_path(c->root_path);
+                _runtime->set_callbacks(c->callbacks);
 		_runtime->start();
 	}
 

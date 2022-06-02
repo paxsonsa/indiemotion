@@ -3,7 +3,8 @@
 //
 #pragma once
 #include <memory>
-#include <indiemotion/impl/server_runtime.hpp>
+#include <indiemotion/server_runtime.hpp>
+#include <indiemotion/callbacks.hpp>
 
 namespace indiemotion
 {
@@ -11,18 +12,18 @@ namespace indiemotion
 		std::string address;
 		unsigned short port;
 		std::string root_path;
+                std::shared_ptr<GlobalCallbacks> callbacks;
 	};
 
 	class Server: public std::enable_shared_from_this<Server> {
 	public:
-		Server();
-		~Server() = default;
-		void start(std::shared_ptr<ServerConfiguration> c);
-		void wait();
-//		int registerController(std::shared_ptr<Controller> controller);
-//      GlobalCallbacks class
+            Server();
+            ~Server() = default;
+            void start(std::shared_ptr<ServerConfiguration> c);
+            void wait();
 
 	private:
-		std::shared_ptr<internal::_ServerRuntime> _runtime;
+		std::shared_ptr<ServerRuntime> _runtime;
+
 	};
 }

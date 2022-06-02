@@ -122,8 +122,8 @@ namespace indiemotion::internal
 		return send(std::move(res));
 	}
 
-	HttpSession::HttpSession(tcp::socket&& socket, std::string root)
-		: _stream(std::move(socket)), _doc_root(std::move(root))
+	HttpSession::HttpSession(tcp::socket&& socket, std::string root, std::shared_ptr<GlobalCallbacks> callbacks)
+		: _stream(std::move(socket)), _doc_root(std::move(root)), _callbacks(std::move(callbacks))
 	{
 	}
 
@@ -168,8 +168,6 @@ namespace indiemotion::internal
 		if (ec)
 			return _fail(ec, "read");
 
-		// TODO: Configure a WebSocket Session with Echo Server for Test
-		// TODO: How might we enable the server DCC to send messages anytime it wants?
 		// See if it is a WebSocket Upgrade
 		if (websocket::is_upgrade(_parser->get()))
 		{
@@ -177,7 +175,8 @@ namespace indiemotion::internal
 			// of both the socket and the HTTP request.
 
 			std::make_shared<Websocket>(
-				std::move(_stream.release_socket())
+				std::move(_stream.release_socket()),
+                                _callbacks
 			)->run(_parser->release());
 
 			return;

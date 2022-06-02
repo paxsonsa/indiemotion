@@ -1,9 +1,11 @@
 #include <iostream>
 #include <memory>
 #include <filesystem>
-#include <indiemotion/server.hpp>
 
 #include <fmt/core.h>
+
+#include <indiemotion/server.hpp>
+#include "callbacks.hpp"
 
 using namespace indiemotion;
 
@@ -12,10 +14,12 @@ int main()
 	auto cwd = std::filesystem::current_path();
 	auto server = std::make_unique<Server>();
 	auto config = std::make_shared<ServerConfiguration>();
+        auto callbacks = std::make_shared<DefaultCallbacks>();
+
 	config->address = "127.0.0.1";
 	config->port = 2255;
 	config->root_path = cwd.string();
-
+        config->callbacks = callbacks;
 	server->start(config);
 	fmt::print("* * * IndieMotion Standalone Server * * *\n");
 	fmt::print("* * * {} * * *\n", cwd.string());
