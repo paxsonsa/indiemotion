@@ -4,18 +4,26 @@
 
 namespace indiemotion::internal {
     Websocket::Websocket(tcp::socket &&socket,
-                         std::shared_ptr<GlobalCallbacks> callbacks)
-        : _stream(std::move(socket)), _callbacks(std::move(callbacks)), _tag(uuid_generator()()) {}
+                         std::shared_ptr<Runtime> runtime)
+        : _stream(std::move(socket)), _runtime(std::move(runtime)) {
+    }
 
     Websocket::~Websocket() {
         // Remove this session from the list of active sessions
+//         _runtime->leave(_as_connection());
+    }
+
+    std::shared_ptr<Connection> Websocket::_as_connection() {
+        if (!_conn)
+            _conn = Connection::from(shared_from_this());
+        return _conn;
     }
 
     void Websocket::_fail(beast::error_code ec, char const *what) {
         // Don't report these
         if (ec == net::error::operation_aborted ||
             ec == websocket::error::closed) {
-            // _callbacks->close_session(this);
+            // _runtime->leave(this);
             fmt::print("connection closed.\n");
             return;
         }
@@ -29,31 +37,24 @@ namespace indiemotion::internal {
             return _fail(ec, "accept");
 
         // Add this session to the list of active sessions
-        // TODO: use callbacks to establish a session coordinator to handle: join, leave, receive,
-        _callbacks->pre_websocket_session(shared_from_this());
-        // _callbacks->register_session(this);
+//         _runtime->join(_as_connection());
 
         // Read a message
         _stream.async_read(_buffer,
                            beast::bind_front_handler(&Websocket::_on_read,
-                                                     shared_from_this()));
-
-        _callbacks->post_websocket_session(shared_from_this());
+                                                               shared_from_this()));
     }
 
     void Websocket::_on_read(beast::error_code ec,
-                             std::size_t bytes_transferred) {
+                             std::size_t) {
         // Handle the error, if any
         if (ec)
             return _fail(ec, "read");
 
         // Send to all connections
-        // TODO: Generate Server Runtime to handle all message processing and
         std::string str = beast::buffers_to_string(_buffer.data());
-        auto const msg = std::make_shared<std::string const>(std::move(str));
         fmt::print("{}\n", str);
-        // _callbacks->receive(_tag, std::move(str_msg));
-        send(msg);
+//         _runtime->receive(_as_connection(), std::move(str));
 
         // Clear the buffer
         _buffer.consume(_buffer.size());
@@ -68,7 +69,6 @@ namespace indiemotion::internal {
         // Post our work to the strand, this ensures
         // that the members of `this` will not be
         // accessed concurrently.
-
         net::post(_stream.get_executor(),
                   beast::bind_front_handler(&Websocket::_on_send,
                                             shared_from_this(), ss));
@@ -89,7 +89,7 @@ namespace indiemotion::internal {
     }
 
     void Websocket::_on_write(beast::error_code ec,
-                              std::size_t bytes_transferred) {
+                              std::size_t) {
         // Handle the error, if any
         if (ec)
             return _fail(ec, "write");

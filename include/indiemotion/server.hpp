@@ -3,8 +3,12 @@
 //
 #pragma once
 #include <memory>
-#include <indiemotion/server_runtime.hpp>
+
+#include <beast.hpp>
+#include <net.hpp>
+
 #include <indiemotion/callbacks.hpp>
+#include <indiemotion/runtime.hpp>
 
 namespace indiemotion
 {
@@ -16,14 +20,28 @@ namespace indiemotion
 	};
 
 	class Server: public std::enable_shared_from_this<Server> {
+
+            net::io_context _io_ctx;
+            tcp::acceptor _acceptor;
+            std::string _root;
+            std::shared_ptr<GlobalCallbacks> _callbacks;
+            std::shared_ptr<Runtime> _runtime;
+
 	public:
-            Server();
+            explicit Server(std::shared_ptr<Runtime> rt): _acceptor(_io_ctx), _runtime(std::move(rt)) {}
             ~Server() = default;
-            void start(std::shared_ptr<ServerConfiguration> c);
+
+            void start(std::shared_ptr<ServerConfiguration>);
             void wait();
 
-	private:
-		std::shared_ptr<ServerRuntime> _runtime;
+            Server& operator=(const Server&) =delete;
 
+	private:
+                void do_accept();
+                void on_accept(beast::error_code ec, tcp::socket socket);
+                void set_endpoint(const tcp::endpoint&);
+                void set_reuse_addr(bool);
+                void set_root_path(std::string);
+                void set_callbacks(std::shared_ptr<GlobalCallbacks>);
 	};
 }

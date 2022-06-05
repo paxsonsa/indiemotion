@@ -4,6 +4,7 @@
 #include <net.hpp>
 
 #include <indiemotion/callbacks.hpp>
+#include <indiemotion/runtime.hpp>
 
 namespace indiemotion::internal {
 	class HttpSession: public std::enable_shared_from_this<HttpSession> {
@@ -11,6 +12,7 @@ namespace indiemotion::internal {
 		beast::flat_buffer _buffer;
 		std::string const _doc_root;
                 std::shared_ptr<GlobalCallbacks> _callbacks;
+                std::shared_ptr<Runtime> _runtime;
 
 		// The parser is stored in an optional container so we can
 		// construct it from scratch it at the beginning of each new message.
@@ -24,7 +26,10 @@ namespace indiemotion::internal {
 		void _fail(beast::error_code ec, char const* what);
 
 	public:
-		HttpSession(tcp::socket&& socket, std::string root, std::shared_ptr<GlobalCallbacks> _callbacks);
+		HttpSession(tcp::socket&& socket,
+                            std::string root,
+                            std::shared_ptr<Runtime> runtime,
+                            std::shared_ptr<GlobalCallbacks> callbacks);
 
 		void run();
 

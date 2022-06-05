@@ -63,14 +63,17 @@ find_package(Boost 1.76.0 REQUIRED python program_options)
 add_library(indiemotion
         include/indiemotion/server.hpp
         src/server/server.cpp
-        include/indiemotion/server_runtime.hpp
-        include/beast.hpp include/net.hpp
-        src/server/server_runtime.cpp
+        include/beast.hpp
+        include/net.hpp
         src/server/http_session.cpp
         src/server/http_session.hpp
         src/server/websocket.cpp
         src/server/websocket.hpp
-        include/indiemotion/callbacks.hpp)
+        include/indiemotion/callbacks.hpp
+        include/indiemotion/runtime.hpp
+        include/indiemotion/connection.hpp
+        include/indiemotion/runtimeio.hpp
+        src/server/connection.cpp)
 add_library(indiemotion::indiemotion ALIAS indiemotion)
 set_target_properties(indiemotion PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(indiemotion PROPERTIES
