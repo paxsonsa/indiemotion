@@ -12,7 +12,7 @@ using namespace indiemotion;
 int main()
 {
 	auto cwd = std::filesystem::current_path();
-        auto runtime = std::shared_ptr<EchoRuntime>();
+        auto runtime = std::make_shared<EchoRuntime>();
 	auto server = std::make_shared<Server>(runtime);
 	auto config = std::make_shared<ServerConfiguration>();
         auto callbacks = std::make_shared<DefaultCallbacks>();

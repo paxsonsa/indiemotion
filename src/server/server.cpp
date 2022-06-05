@@ -68,14 +68,12 @@ namespace indiemotion {
     }
 
     void Server::do_accept() {
-        fmt::print("do_accept()\n");
         _acceptor.async_accept(
             net::make_strand(_io_ctx),
             beast::bind_front_handler(&Server::on_accept, shared_from_this()));
     }
 
     void Server::on_accept(beast::error_code ec, tcp::socket socket) {
-        fmt::print("on_accept()\n");
         if (ec) {
             fmt::print("failed while accepting connection...\n");
         } else {

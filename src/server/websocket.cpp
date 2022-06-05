@@ -10,7 +10,7 @@ namespace indiemotion::internal {
 
     Websocket::~Websocket() {
         // Remove this session from the list of active sessions
-//         _runtime->leave(_as_connection());
+         _runtime->leave(_as_connection());
     }
 
     std::shared_ptr<Connection> Websocket::_as_connection() {
@@ -37,7 +37,8 @@ namespace indiemotion::internal {
             return _fail(ec, "accept");
 
         // Add this session to the list of active sessions
-//         _runtime->join(_as_connection());
+        auto c = _as_connection();
+         _runtime->join(std::move(c));
 
         // Read a message
         _stream.async_read(_buffer,
@@ -54,7 +55,7 @@ namespace indiemotion::internal {
         // Send to all connections
         std::string str = beast::buffers_to_string(_buffer.data());
         fmt::print("{}\n", str);
-//         _runtime->receive(_as_connection(), std::move(str));
+         _runtime->receive(_as_connection(), std::move(str));
 
         // Clear the buffer
         _buffer.consume(_buffer.size());

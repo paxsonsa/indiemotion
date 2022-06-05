@@ -55,8 +55,6 @@ namespace indiemotion::internal {
             }));
 
         // Accept the websocket handshake
-        fmt::print("websocket::run()\n");
-        fmt::print("async_accept starting");
         _stream.async_accept(req, beast::bind_front_handler(
                                       &Websocket::_on_accept, shared_from_this()));
     }
