@@ -59,6 +59,8 @@ include(CopyDllsForDebug)
 # -----------------------------------------------------------------------------
 add_subdirectory(vendor)
 find_package(Boost 1.76.0 REQUIRED python program_options)
+include(FindProtobuf)
+find_package(Protobuf REQUIRED)
 
 add_library(indiemotion
         include/indiemotion/server.hpp
@@ -72,8 +74,10 @@ add_library(indiemotion
         include/indiemotion/callbacks.hpp
         include/indiemotion/runtime.hpp
         include/indiemotion/connection.hpp
-        include/indiemotion/runtimeio.hpp
-        src/server/connection.cpp)
+        include/indiemotion/proto/messages.pb.h
+        include/indiemotion/proto/messages.pb.cc
+        src/server/connection.cpp
+        include/indiemotion/messaging.hpp src/messages/messaging.cpp)
 add_library(indiemotion::indiemotion ALIAS indiemotion)
 set_target_properties(indiemotion PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(indiemotion PROPERTIES
@@ -91,11 +95,20 @@ target_link_libraries(indiemotion
         Boost::boost
         spdlog::spdlog
         fmt::fmt
+        protobuf::libprotobuf
         )
 
 add_executable(imserver src/imserver/main.cpp src/imserver/callbacks.hpp)
 target_compile_features(imserver PUBLIC cxx_std_17)
 target_link_libraries(imserver
+        PUBLIC
+        indiemotion
+        fmt::fmt
+        )
+
+add_executable(mgen src/mgen/main.cpp)
+target_compile_features(imserver PUBLIC cxx_std_17)
+target_link_libraries(mgen
         PUBLIC
         indiemotion
         fmt::fmt

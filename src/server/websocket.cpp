@@ -1,6 +1,10 @@
-#include "websocket.hpp"
-#include <fmt/core.h>
 #include <iostream>
+
+#include <fmt/core.h>
+#include <google/protobuf/util/json_util.h>
+
+#include <indiemotion/messaging.hpp>
+#include "websocket.hpp"
 
 namespace indiemotion::internal {
     Websocket::Websocket(tcp::socket &&socket,
@@ -54,8 +58,22 @@ namespace indiemotion::internal {
 
         // Send to all connections
         std::string str = beast::buffers_to_string(_buffer.data());
-        fmt::print("{}\n", str);
-         _runtime->receive(_as_connection(), std::move(str));
+
+        // Clear the buffer
+        _buffer.consume(_buffer.size());
+
+        // Parse Message
+        Message message;
+        if (!message.ParseFromString(str)) {
+            fmt::print("failed to parse incoming message as protobuf: {}", str);
+        } else {
+            // Debug Log Message
+            std::string msg_str;
+            google::protobuf::util::MessageToJsonString(message, &msg_str);
+            fmt::print("incoming message: {} \n", msg_str);
+
+             _runtime->receive(_as_connection(), std::move(message));
+        }
 
         // Clear the buffer
         _buffer.consume(_buffer.size());
@@ -63,7 +81,7 @@ namespace indiemotion::internal {
         // Read another message
         _stream.async_read(_buffer,
                            beast::bind_front_handler(&Websocket::_on_read,
-                                                     shared_from_this()));
+                                                               shared_from_this()));
     }
 
     void Websocket::send(std::shared_ptr<std::string const> const &ss) {

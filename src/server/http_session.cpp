@@ -7,8 +7,8 @@
 
 #include <fmt/core.h>
 
-#include "websocket.hpp"
 #include "http_session.hpp"
+#include "websocket.hpp"
 
 namespace indiemotion::internal {
 
@@ -118,34 +118,23 @@ namespace indiemotion::internal {
         return send(std::move(res));
     }
 
-        HttpSession::HttpSession(tcp::socket&& socket,
-                                 std::string root,
-                                 std::shared_ptr<Runtime> runtime,
-                                 std::shared_ptr<GlobalCallbacks> callbacks)
-		: _stream(std::move(socket)),
-                  _runtime(std::move(runtime)),
-                  _doc_root(std::move(root)),
-                  _callbacks(std::move(callbacks))
-	{
-	}
+    HttpSession::HttpSession(tcp::socket &&socket, std::string root,
+                             std::shared_ptr<Runtime> runtime,
+                             std::shared_ptr<GlobalCallbacks> callbacks)
+        : _stream(std::move(socket)), _runtime(std::move(runtime)),
+          _doc_root(std::move(root)), _callbacks(std::move(callbacks)) {}
 
-	void HttpSession::run()
-	{
-            _do_read();
-	}
+    void HttpSession::run() { _do_read(); }
 
-	void HttpSession::_fail(beast::error_code ec, char const* what)
-	{
+    void HttpSession::_fail(beast::error_code ec, char const *what) {
         // Don't report on canceled operations
         if (ec == net::error::operation_aborted)
             return;
 
         std::cerr << what << ": " << ec.message() << "\n";
-	}
+    }
 
-	void HttpSession::_do_read()
-	{
-        fmt::print("_do_read()\n");
+    void HttpSession::_do_read() {
         _parser.emplace();
         _parser->body_limit(10000);
         _stream.expires_after(std::chrono::seconds(5));
@@ -153,10 +142,9 @@ namespace indiemotion::internal {
         http::async_read(_stream, _buffer, _parser->get(),
                          beast::bind_front_handler(&HttpSession::_on_read,
                                                    shared_from_this()));
-	}
+    }
 
-	void HttpSession::_on_read(beast::error_code ec, std::size_t)
-	{
+    void HttpSession::_on_read(beast::error_code ec, std::size_t) {
         if (ec == http::error::end_of_stream) {
             _stream.socket().shutdown(tcp::socket::shutdown_send, ec);
             return;
@@ -170,8 +158,23 @@ namespace indiemotion::internal {
         if (websocket::is_upgrade(_parser->get())) {
             // Create a websocket session, transferring ownership
             // of both the socket and the HTTP request.
+
+            // TODO: Configure Websocket Message Parser
+            auto msg_type = determine_msg_type(_parser);
+
+            if (msg_type == MessageType::unknown) {
+                // TODO: Send bad mime type response
+                return;
+            }
+
+            auto content_type = _parser->get()[http::field::content_type];
+            fmt::print("Content-Type: {}\n", content_type.to_string());
+
+            auto decoder = MessageDecoder::create_for(msg_type);
             std::make_shared<Websocket>(std::move(_stream.release_socket()),
-                                        _runtime)->run(_parser->release());
+                                        decoder,
+                                        _runtime)
+                ->run(_parser->release());
             return;
         }
 
@@ -191,10 +194,9 @@ namespace indiemotion::internal {
                     self->_on_write(ec, bytes, sp->need_eof());
                 });
         });
-	}
+    }
 
-	void HttpSession::_on_write(beast::error_code ec, std::size_t, bool close)
-	{
+    void HttpSession::_on_write(beast::error_code ec, std::size_t, bool close) {
         // Handle the error, if any
         if (ec)
             return _fail(ec, "write");
@@ -208,5 +210,5 @@ namespace indiemotion::internal {
 
         // Read another request
         _do_read();
-	}
+    }
 } // namespace indiemotion::internal
