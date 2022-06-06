@@ -8,8 +8,9 @@
 
 namespace indiemotion::internal {
     Websocket::Websocket(tcp::socket &&socket,
+                         std::shared_ptr<MessageDecoder> decoder,
                          std::shared_ptr<Runtime> runtime)
-        : _stream(std::move(socket)), _runtime(std::move(runtime)) {
+        : _stream(std::move(socket)), _decoder(std::move(decoder)), _runtime(std::move(runtime)) {
     }
 
     Websocket::~Websocket() {
@@ -64,16 +65,13 @@ namespace indiemotion::internal {
 
         // Parse Message
         Message message;
-        if (!message.ParseFromString(str)) {
+        if (!_decoder->decode(message, str))
+        {
             fmt::print("failed to parse incoming message as protobuf: {}", str);
-        } else {
-            // Debug Log Message
-            std::string msg_str;
-            google::protobuf::util::MessageToJsonString(message, &msg_str);
-            fmt::print("incoming message: {} \n", msg_str);
-
-             _runtime->receive(_as_connection(), std::move(message));
+            // TODO: Queue Error Message
+            return;
         }
+         _runtime->receive(_as_connection(), std::move(message));
 
         // Clear the buffer
         _buffer.consume(_buffer.size());

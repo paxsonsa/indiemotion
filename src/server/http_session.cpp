@@ -10,6 +10,8 @@
 #include "http_session.hpp"
 #include "websocket.hpp"
 
+#include <indiemotion/messaging.hpp>
+
 namespace indiemotion::internal {
 
     std::string path_cat(std::string_view base, beast::string_view path) {
@@ -160,20 +162,39 @@ namespace indiemotion::internal {
             // of both the socket and the HTTP request.
 
             // TODO: Configure Websocket Message Parser
-            auto msg_type = determine_msg_type(_parser);
-
-            if (msg_type == MessageType::unknown) {
-                // TODO: Send bad mime type response
+            auto mt = determine_msg_type(_parser.get());
+            if (mt == MessageType::unknown) {
+                // Returns a bad request response
+                auto req = _parser->release();
+                auto const bad_request = [&req](beast::string_view why) {
+                    http::response<http::string_body> res{
+                        http::status::bad_request, req.version()};
+                    res.set(http::field::server, BOOST_BEAST_VERSION_STRING);
+                    res.set(http::field::content_type, "text/html");
+                    res.keep_alive(req.keep_alive());
+                    res.body() = std::string(why);
+                    res.prepare_payload();
+                    return res;
+                };
+                auto response =
+                    bad_request("Content-Type is not supported. (valid: "
+                                "application/json, application/octet-stream)");
+                using response_type =
+                    typename std::decay<decltype(response)>::type;
+                auto sp = std::make_shared<response_type>(
+                    std::forward<decltype(response)>(response));
+                auto self = shared_from_this();
+                http::async_write(
+                    _stream, *sp,
+                    [self, sp](beast::error_code ec, std::size_t bytes) {
+                        self->_on_write(ec, bytes, sp->need_eof());
+                    });
                 return;
             }
 
-            auto content_type = _parser->get()[http::field::content_type];
-            fmt::print("Content-Type: {}\n", content_type.to_string());
-
-            auto decoder = MessageDecoder::create_for(msg_type);
+            auto decoder = MessageDecoderFactory::from(mt);
             std::make_shared<Websocket>(std::move(_stream.release_socket()),
-                                        decoder,
-                                        _runtime)
+                                        std::move(decoder), _runtime)
                 ->run(_parser->release());
             return;
         }

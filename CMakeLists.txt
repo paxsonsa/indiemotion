@@ -58,7 +58,7 @@ include(CopyDllsForDebug)
 # Find Core Packages
 # -----------------------------------------------------------------------------
 add_subdirectory(vendor)
-find_package(Boost 1.76.0 REQUIRED python program_options)
+find_package(Boost 1.76.0 REQUIRED program_options)
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 

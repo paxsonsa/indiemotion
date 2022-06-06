@@ -8,6 +8,7 @@
 #include <net.hpp>
 
 #include <indiemotion/connection.hpp>
+#include <indiemotion/messaging.hpp>
 #include <indiemotion/runtime.hpp>
 
 namespace indiemotion::internal {
@@ -16,6 +17,7 @@ namespace indiemotion::internal {
         beast::flat_buffer _buffer;
         websocket::stream<beast::tcp_stream> _stream;
         std::shared_ptr<Connection> _conn = nullptr;
+        std::shared_ptr<MessageDecoder> _decoder = nullptr;
         std::vector<std::shared_ptr<std::string const>> _queue;
         std::shared_ptr<Runtime> _runtime;
 
@@ -28,6 +30,7 @@ namespace indiemotion::internal {
 
       public:
         explicit Websocket(tcp::socket &&socket,
+                           std::shared_ptr<MessageDecoder> decoder,
                            std::shared_ptr<Runtime> runtime);
 
         ~Websocket();
