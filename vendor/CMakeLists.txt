@@ -10,3 +10,6 @@ set_target_properties(fmt PROPERTIES FOLDER "vendor")
 add_subdirectory(spdlog EXCLUDE_FROM_ALL)
 target_compile_definitions(spdlog INTERFACE SPDLOG_FMT_EXTERNAL)
 set_target_properties(spdlog PROPERTIES FOLDER "vendor")
+
+add_subdirectory(googletest EXCLUDE_FROM_ALL)
+set_target_properties(gtest PROPERTIES FOLDER "vendor")
