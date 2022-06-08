@@ -62,22 +62,28 @@ find_package(Boost 1.76.0 REQUIRED program_options)
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 
-add_library(indiemotion
-        include/indiemotion/server.hpp
-        src/server/server.cpp
+add_library(indiemotion SHARED
         include/beast.hpp
         include/net.hpp
+        src/context.cpp
+        src/server/server.cpp
+        src/server/message.cpp
+        src/server/connection.cpp
         src/server/http_session.cpp
         src/server/http_session.hpp
         src/server/websocket.cpp
         src/server/websocket.hpp
-        include/indiemotion/callbacks.hpp
+        include/indiemotion/error.hpp
+        include/indiemotion/server.hpp
+        include/indiemotion/message.hpp
         include/indiemotion/runtime.hpp
+        include/indiemotion/context.hpp
+        include/indiemotion/callbacks.hpp
         include/indiemotion/connection.hpp
+        include/indiemotion/message_gen.hpp
         include/indiemotion/proto/messages.pb.h
         include/indiemotion/proto/messages.pb.cc
-        src/server/connection.cpp
-        include/indiemotion/messaging.hpp src/server/messaging.cpp include/indiemotion/context.hpp src/context.cpp)
+        src/server/message_gen.cpp)
 add_library(indiemotion::indiemotion ALIAS indiemotion)
 set_target_properties(indiemotion PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(indiemotion PROPERTIES
@@ -98,7 +104,7 @@ target_link_libraries(indiemotion
         protobuf::libprotobuf
         )
 
-add_executable(imserver src/imserver/main.cpp src/imserver/callbacks.hpp)
+add_executable(imserver src/imserver/main.cpp)
 target_compile_features(imserver PUBLIC cxx_std_17)
 target_link_libraries(imserver
         PUBLIC
@@ -107,7 +113,7 @@ target_link_libraries(imserver
         )
 
 add_executable(mgen src/mgen/main.cpp)
-target_compile_features(imserver PUBLIC cxx_std_17)
+target_compile_features(mgen PUBLIC cxx_std_17)
 target_link_libraries(mgen
         PUBLIC
         indiemotion

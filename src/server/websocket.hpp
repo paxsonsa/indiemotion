@@ -8,7 +8,7 @@
 #include <net.hpp>
 
 #include <indiemotion/connection.hpp>
-#include <indiemotion/messaging.hpp>
+#include <indiemotion/message.hpp>
 #include <indiemotion/runtime.hpp>
 
 namespace indiemotion::internal {
@@ -40,6 +40,7 @@ namespace indiemotion::internal {
 
         // Send a message
         void send(std::shared_ptr<std::string const> const &ss) override;
+        void send(Message &&msg) override;
     };
 
     template <class Body, class Allocator>

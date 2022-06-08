@@ -10,7 +10,7 @@
 #include "http_session.hpp"
 #include "websocket.hpp"
 
-#include <indiemotion/messaging.hpp>
+#include <indiemotion/message.hpp>
 
 namespace indiemotion::internal {
 

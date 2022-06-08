@@ -3,16 +3,19 @@
 #include <filesystem>
 
 #include <fmt/core.h>
-
 #include <indiemotion/server.hpp>
-#include "callbacks.hpp"
 
 using namespace indiemotion;
+
+class DefaultCallbacks: public GlobalCallbacks
+{
+};
+
 
 int main()
 {
 	auto cwd = std::filesystem::current_path();
-        auto runtime = std::make_shared<EchoRuntime>();
+        auto runtime = std::make_shared<EmbeddedRuntime>();
 	auto server = std::make_shared<Server>(runtime);
 	auto config = std::make_shared<ServerConfiguration>();
         auto callbacks = std::make_shared<DefaultCallbacks>();

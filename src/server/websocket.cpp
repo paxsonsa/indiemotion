@@ -3,8 +3,8 @@
 #include <fmt/core.h>
 #include <google/protobuf/util/json_util.h>
 
-#include <indiemotion/messaging.hpp>
 #include "websocket.hpp"
+#include <indiemotion/message.hpp>
 
 namespace indiemotion::internal {
     Websocket::Websocket(tcp::socket &&socket,
@@ -89,6 +89,14 @@ namespace indiemotion::internal {
         net::post(_stream.get_executor(),
                   beast::bind_front_handler(&Websocket::_on_send,
                                             shared_from_this(), ss));
+    }
+
+    void Websocket::send(Message &&msg)
+    {
+        auto encoded = _decoder->encode(std::move(msg));
+        auto const ss =
+            std::make_shared<std::string const>(std::move(encoded));
+        send(ss);
     }
 
     void Websocket::_on_send(std::shared_ptr<std::string const> const &ss) {
