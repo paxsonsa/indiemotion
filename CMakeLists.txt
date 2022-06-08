@@ -77,7 +77,7 @@ add_library(indiemotion
         include/indiemotion/proto/messages.pb.h
         include/indiemotion/proto/messages.pb.cc
         src/server/connection.cpp
-        include/indiemotion/messaging.hpp src/messages/messaging.cpp)
+        include/indiemotion/messaging.hpp src/server/messaging.cpp include/indiemotion/context.hpp src/context.cpp)
 add_library(indiemotion::indiemotion ALIAS indiemotion)
 set_target_properties(indiemotion PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(indiemotion PROPERTIES
@@ -113,3 +113,21 @@ target_link_libraries(mgen
         indiemotion
         fmt::fmt
         )
+
+# -----------------------------------------------------------------------------
+# Tests
+# -----------------------------------------------------------------------------
+# Enable Testing before generating sources to ensure the tests in the submodules are found
+include(GoogleTest)
+set(TEST_RUNNER_PARAMS "--force-colors=false" CACHE STRING "Options to add to our test runners commands")
+enable_testing()
+
+add_executable(test_context src/test_context.cpp)
+target_compile_features(test_context PUBLIC cxx_std_17)
+target_link_libraries(test_context
+        PUBLIC
+        indiemotion
+        gtest
+        gtest_main
+)
+gtest_discover_tests(test_context)
