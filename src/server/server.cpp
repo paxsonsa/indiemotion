@@ -77,12 +77,10 @@ namespace indiemotion {
         if (ec) {
             fmt::print("failed while accepting connection...\n");
         } else {
-            fmt::print("Accepting a new connection!\n");
             std::make_shared<internal::HttpSession>(std::move(socket),
                                                     _root,
                                                     _runtime,
-                                                    _callbacks)
-                ->run();
+                                                    _callbacks)->run();
         }
         do_accept();
     }

@@ -69,20 +69,25 @@ namespace indiemotion {
         // Keep a list of all the connected clients
         std::unordered_set<std::shared_ptr<Connection>> _connections;
 
+        void _leave(std::shared_ptr<Connection> ptr) {
+            _connections.erase(ptr);
+        }
+
       public:
         explicit EmbeddedRuntime() = default;
 
         void join(std::shared_ptr<Connection> ptr) override {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::scoped_lock<std::mutex> lock(mutex_);
             _connections.insert(ptr);
         }
         void leave(std::shared_ptr<Connection> ptr) override {
-            std::lock_guard<std::mutex> lock(mutex_);
-            _connections.erase(ptr);
+            std::scoped_lock<std::mutex> lock(mutex_);
+            _leave(ptr);
         }
+
         void receive(std::shared_ptr<Connection> conn,
                      Message &&msg) override {
-            std::lock_guard<std::mutex> lock(mutex_);
+            std::scoped_lock<std::mutex> lock(mutex_);
 
             /**
              * TODO -- Client Connection Protocol
@@ -97,7 +102,7 @@ namespace indiemotion {
                     conn->send(
                         error_message(Error::BadMessage, "client is not registered.")
                     );
-                    leave(conn);
+                    _leave(conn);
                 } else {
                     // Register Client Information with Connection
                     // - mark connection as registered.

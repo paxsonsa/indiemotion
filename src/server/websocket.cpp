@@ -43,7 +43,7 @@ namespace indiemotion::internal {
 
         // Add this session to the list of active sessions
         auto c = _as_connection();
-         _runtime->join(std::move(c));
+        _runtime->join(std::move(c));
 
         // Read a message
         _stream.async_read(_buffer,
@@ -68,13 +68,12 @@ namespace indiemotion::internal {
         if (!_decoder->decode(message, str))
         {
             fmt::print("failed to parse incoming message as protobuf: {}", str);
-            // TODO: Queue Error Message
+            send(
+                error_message(Error::BadMessage, "failed to parse incoming message")
+            );
             return;
         }
          _runtime->receive(_as_connection(), std::move(message));
-
-        // Clear the buffer
-        _buffer.consume(_buffer.size());
 
         // Read another message
         _stream.async_read(_buffer,
@@ -88,7 +87,7 @@ namespace indiemotion::internal {
         // accessed concurrently.
         net::post(_stream.get_executor(),
                   beast::bind_front_handler(&Websocket::_on_send,
-                                            shared_from_this(), ss));
+                                                    shared_from_this(), ss));
     }
 
     void Websocket::send(Message &&msg)
