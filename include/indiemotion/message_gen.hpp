@@ -23,4 +23,6 @@ namespace indiemotion {
     Message make_message();
 
     Message error_message(Error error, std::string reason);
+
+    Message error_message(const Exception &exception);
 }

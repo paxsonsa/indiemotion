@@ -42,4 +42,14 @@ namespace indiemotion
 
         return std::move(message);
     }
+
+    Message error_message(const Exception &exception) {
+        // TODO: Determine Error to Exception Mapping
+        auto message = make_message();
+        auto err = message.mutable_error();
+
+        err->set_type(Payload::Error::Unknown);
+        err->set_description(exception.what());
+        return message;
+    }
 }

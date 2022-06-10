@@ -83,7 +83,7 @@ add_library(indiemotion SHARED
         include/indiemotion/message_gen.hpp
         include/indiemotion/proto/messages.pb.h
         include/indiemotion/proto/messages.pb.cc
-        src/server/message_gen.cpp)
+        src/server/message_gen.cpp include/indiemotion/engine.hpp src/engine.cpp include/indiemotion/controller.hpp)
 add_library(indiemotion::indiemotion ALIAS indiemotion)
 set_target_properties(indiemotion PROPERTIES LINKER_LANGUAGE CXX)
 set_target_properties(indiemotion PROPERTIES

@@ -8,6 +8,7 @@
 #include <indiemotion/connection.hpp>
 #include <indiemotion/message.hpp>
 #include <indiemotion/message_gen.hpp>
+#include <indiemotion/engine.hpp>
 
 namespace indiemotion {
     class Runtime {
@@ -69,12 +70,15 @@ namespace indiemotion {
         // Keep a list of all the connected clients
         std::unordered_set<std::shared_ptr<Connection>> _connections;
 
-        void _leave(std::shared_ptr<Connection> ptr) {
+        // Hold an instance of engine it's self.
+        std::shared_ptr<Engine> _engine;
+
+        void _leave(const std::shared_ptr<Connection>& ptr) {
             _connections.erase(ptr);
         }
 
       public:
-        explicit EmbeddedRuntime() = default;
+        explicit EmbeddedRuntime(std::shared_ptr<Engine> engine): _engine(std::move(engine)) {};
 
         void join(std::shared_ptr<Connection> ptr) override {
             std::scoped_lock<std::mutex> lock(mutex_);
@@ -89,12 +93,6 @@ namespace indiemotion {
                      Message &&msg) override {
             std::scoped_lock<std::mutex> lock(mutex_);
 
-            /**
-             * TODO -- Client Connection Protocol
-             * - Register Client
-             *    - Name
-             *    - Role (Observer, Application, Controller)
-             */
             if (!conn->registered()) {
                 // if message is not client id, fail else compute client info
                 if (!msg.has_client_info()) {
@@ -112,73 +110,22 @@ namespace indiemotion {
                 }
                 return;
             }
-            /**
-             * ContextTree
-             *
-             * session/id
-             * session/name
-             * session/device/id
-             * session/device/name
-             * session/host/id
-             * session/host/name
-             * session/user
-             *
-             * scene/origin
-             * scene/camera/id
-             * scene/camera/origin/x
-             * scene/camera/origin/y
-             * scene/camera/origin/x
-             * scene/camera/fov
-             * scene/camera/resolution/x
-             * scene/camera/resolution/y
-             *
-             * motion/frame/number
-             * motion/frame/timecode
-             * motion/frame/channel/image
-             * motion/frame/channel/focal
-             * motion/frame/channel/aperture
-             * motion/frame/channel/xform
-             * motion/frame/channel/
-             */
 
-            /**
-             * Context Lifecycle
-             *
-             * ContextView
-             *    get()
-             *
-             * Context: ContextView
-             *    - current: ContextView
-             *    - previous: ContextView
-             *    - update(ContextEntry)
-             *    - diff() -> [ContextEntry]
-             *    - commit() -> bool
-             *    - revert() -> bool
-             *    - update()
-             *    - get(T)
-             *    - current(T)
-             *    - previous(T)
-             *
-             * ContextEntry<T>
-             *      name: std::string
-             *      animatable: bool
-             *      prev: T
-             *      current: T
-             *
-             *      update(T)
-             *
-             *
-             * context->update(key, T)
-             * context->get(key)
-             *
-             * context.commit()
-             *
-             * context.previous() -> ContextView
-             * context.current() -> ContextView
-             *
-             *
-             */
-
+            try {
+                _engine->render(std::move(msg));
+            }
+            catch (Exception e) {
+                error_message(e);
+            }
+//            try {
+//                for (auto &controller : controllers) {
+//                    controller->tick(&msg, context);
+//                }
+//            }
+//            catch (***) {
+//                context.revert();
+//            }
+//            context.commit();
             /**
              * - Compute State Changes (as object? up front?)
              *     - Seperate object or apart of the controller?
