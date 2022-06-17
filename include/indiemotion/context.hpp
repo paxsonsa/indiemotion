@@ -1,48 +1,61 @@
 #pragma once
 #include <any>
+#include <deque>
+#include <iostream>
 #include <string>
+#include <set>
 #include <unordered_map>
+#include <iterator> // For std::forward_iterator_tag
+#include <vector> // For std::forward_iterator_tag
 
 namespace indiemotion
 {
 
-    struct ContextEntry
+    struct Context: public std::enable_shared_from_this<Context>
     {
-        ContextEntry() = default;
+        struct Value {
+            Value() = default;
 
-        ContextEntry(std::shared_ptr<std::any> &&obj):
-            wrapped_value(std::move(obj)) {}
+            explicit Value(std::shared_ptr<std::any> obj): wrapped_value(std::move(obj)) {}
+            explicit Value(std::shared_ptr<std::any> &&obj): wrapped_value(std::move(obj)) {}
 
-        std::shared_ptr<std::any> wrapped_value = nullptr;
+            std::shared_ptr<std::any> wrapped_value = nullptr;
 
-        template <typename T>
-        T as() const {
-            return std::any_cast<T>(*wrapped_value);
-        }
+            template <typename T>
+            T as() const { return std::any_cast<T>(*wrapped_value); }
 
-        bool empty() const
+            bool empty() const
+            { return wrapped_value == nullptr; }
+        };
+
+        using Revision = std::unordered_map<std::string, std::shared_ptr<std::any>>;
+        struct RevisionView
         {
-            return wrapped_value == nullptr;
-        }
-    };
+            RevisionView() = default;
+            explicit RevisionView(std::vector<std::shared_ptr<Revision>> &&);
+            Value operator[] (std::string) const;
+            std::optional<Value> get(std::string) const;
 
-    using ContextMap = std::unordered_map<std::string, ContextEntry>;
+          private:
+            std::vector<std::shared_ptr<Revision>> _revs;
+        };
 
-    struct Context
-    {
+
+        RevisionView pending;
+        RevisionView saved;
+        RevisionView current;
+
         Context();
-        void commit();
-        void revert();
+
 
         void update(std::string key, std::any value);
-        ContextEntry get(std::string key) const;
-        ContextEntry current(std::string key) const;
-        ContextEntry previous(std::string key) const;
+        void save();
+        RevisionView revision(int);
+        RevisionView rollback();
+        void clear_pending();
 
-      private:
-        std::shared_ptr<ContextMap> _previous;
-        std::shared_ptr<ContextMap> _diff;
-        std::shared_ptr<ContextMap> _current;
-
+        protected:
+          std::shared_ptr<Revision> _next_rev = {};
+          std::deque<std::shared_ptr<Revision>> _revisions;
     };
 }

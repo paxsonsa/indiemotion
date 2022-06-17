@@ -6,64 +6,77 @@ using namespace indiemotion;
 TEST(ContextUpdateCommitTest, BasicAssertions)
 {
     Context ctx;
-    EXPECT_TRUE(ctx.get("keyA").empty());
-    EXPECT_TRUE(ctx.get("keyB").empty());
-    EXPECT_TRUE(ctx.get("keyA/nested").empty());
 
     ctx.update("keyA", std::string("hello"));
-    ctx.update("keyB", 2);
-    ctx.update("keyA/nested", true);
+    ctx.update("keyB", 100);
+    ctx.update("keyC", false);
+    ASSERT_EQ(ctx.saved.get("keyA").has_value(), false);
+    ASSERT_EQ(ctx.saved.get("keyB").has_value(), false);
+    ASSERT_EQ(ctx.saved.get("keyC").has_value(), false);
 
-    EXPECT_EQ(ctx.get("keyA").as<std::string>(), "hello");
-    EXPECT_EQ(ctx.get("keyB").as<int>(), 2);
-    EXPECT_EQ(ctx.get("keyA/nested").as<bool>(), true);
+    ASSERT_EQ(ctx.current["keyA"].as<std::string>(), "hello");
+    ASSERT_EQ(ctx.current["keyB"].as<int>(), 100);
+    ASSERT_EQ(ctx.current["keyC"].as<bool>(), false);
 
-    EXPECT_TRUE(ctx.previous("keyA").empty());
-    EXPECT_TRUE(ctx.previous("keyB").empty());
-    EXPECT_TRUE(ctx.previous("keyA/nested").empty());
+    ctx.save();
 
-    ctx.commit();
+    ASSERT_EQ(ctx.current["keyA"].as<std::string>(), "hello");
+    ASSERT_EQ(ctx.current["keyB"].as<int>(), 100);
+    ASSERT_EQ(ctx.current["keyC"].as<bool>(), false);
 
-    EXPECT_EQ(ctx.get("keyA").as<std::string>(), "hello");
-    EXPECT_EQ(ctx.get("keyB").as<int>(), 2);
-    EXPECT_EQ(ctx.get("keyA/nested").as<bool>(), true);
+    ctx.update("keyA", std::string("hello, world"));
+    ctx.update("keyB", 50);
 
-    EXPECT_EQ(ctx.current("keyA").as<std::string>(), "hello");
-    EXPECT_EQ(ctx.current("keyB").as<int>(), 2);
-    EXPECT_EQ(ctx.current("keyA/nested").as<bool>(), true);
+    ASSERT_EQ(ctx.current["keyA"].as<std::string>(), "hello, world");
+    ASSERT_EQ(ctx.current["keyB"].as<int>(), 50);
+    ASSERT_EQ(ctx.current["keyC"].as<bool>(), false);
 
-    EXPECT_TRUE(ctx.previous("keyA").empty());
-    EXPECT_TRUE(ctx.previous("keyB").empty());
-    EXPECT_TRUE(ctx.previous("keyA/nested").empty());
+    ASSERT_EQ(ctx.saved["keyA"].as<std::string>(), "hello");
+    ASSERT_EQ(ctx.saved["keyB"].as<int>(), 100);
+    ASSERT_EQ(ctx.saved["keyC"].as<bool>(), false);
 
-    ctx.update("keyA", std::string("world"));
-    ctx.update("keyB", 99);
-    ctx.update("keyA/nested", false);
+    ASSERT_EQ(ctx.revision(1).get("keyA").has_value(), false);
+    ASSERT_EQ(ctx.revision(1).get("keyB").has_value(), false);
+    ASSERT_EQ(ctx.revision(1).get("keyC").has_value(), false);
 
-    EXPECT_EQ(ctx.get("keyA").as<std::string>(), "world");
-    EXPECT_EQ(ctx.get("keyB").as<int>(), 99);
-    EXPECT_EQ(ctx.get("keyA/nested").as<bool>(), false);
+    ctx.update("keyA", std::string("hello"));
+    ctx.update("keyB", 100);
 
-    EXPECT_EQ(ctx.current("keyA").as<std::string>(), "hello");
-    EXPECT_EQ(ctx.current("keyB").as<int>(), 2);
-    EXPECT_EQ(ctx.current("keyA/nested").as<bool>(), true);
+    ASSERT_EQ(ctx.current["keyA"].as<std::string>(), "hello");
+    ASSERT_EQ(ctx.current["keyB"].as<int>(), 100);
 
-    EXPECT_TRUE(ctx.previous("keyA").empty());
-    EXPECT_TRUE(ctx.previous("keyB").empty());
-    EXPECT_TRUE(ctx.previous("keyA/nested").empty());
+    ASSERT_EQ(ctx.revision(1).get("keyA").has_value(), false);
+    ASSERT_EQ(ctx.revision(1).get("keyB").has_value(), false);
 
-    ctx.commit();
+    ctx.update("keyA", std::string("hello, world"));
+    ctx.update("keyB", 50);
 
-    EXPECT_EQ(ctx.previous("keyA").as<std::string>(), "hello");
-    EXPECT_EQ(ctx.previous("keyB").as<int>(), 2);
-    EXPECT_EQ(ctx.previous("keyA/nested").as<bool>(), true);
+    ctx.save();
 
-    EXPECT_EQ(ctx.get("keyA").as<std::string>(), "world");
-    EXPECT_EQ(ctx.get("keyB").as<int>(), 99);
-    EXPECT_EQ(ctx.get("keyA/nested").as<bool>(), false);
+    ASSERT_EQ(ctx.current["keyA"].as<std::string>(), "hello, world");
+    ASSERT_EQ(ctx.current["keyB"].as<int>(), 50);
 
-    EXPECT_EQ(ctx.current("keyA").as<std::string>(), "world");
-    EXPECT_EQ(ctx.current("keyB").as<int>(), 99);
-    EXPECT_EQ(ctx.current("keyA/nested").as<bool>(), false);
+    ASSERT_EQ(ctx.revision(1)["keyA"].as<std::string>(), "hello");
+    ASSERT_EQ(ctx.revision(1)["keyB"].as<int>(), 100);
 
+    auto rev = ctx.rollback();
+    ASSERT_EQ(rev["keyA"].as<std::string>(), "hello, world");
+    ASSERT_EQ(rev["keyB"].as<int>(), 50);
+
+    ASSERT_EQ(ctx.current["keyA"].as<std::string>(), "hello");
+    ASSERT_EQ(ctx.current["keyB"].as<int>(), 100);
+
+    ASSERT_EQ(ctx.revision(1).get("keyA").has_value(), false);
+    ASSERT_EQ(ctx.revision(1).get("keyB").has_value(), false);
+
+    ctx.update("keyC", true);
+    ASSERT_EQ(ctx.pending["keyC"].as<bool>(), true);
+    ASSERT_EQ(ctx.current["keyC"].as<bool>(), true);
+
+    ASSERT_EQ(ctx.pending.get("keyA").has_value(), false);
+    ASSERT_EQ(ctx.current.get("keyA").has_value(), true);
+
+    ctx.clear_pending();
+    ASSERT_EQ(ctx.pending.get("keyC").has_value(), false);
+    ASSERT_EQ(ctx.current.get("keyC").has_value(), true);
 }
