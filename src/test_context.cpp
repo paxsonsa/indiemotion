@@ -80,3 +80,27 @@ TEST(ContextUpdateCommitTest, BasicAssertions)
     ASSERT_EQ(ctx.pending.get("keyC").has_value(), false);
     ASSERT_EQ(ctx.current.get("keyC").has_value(), true);
 }
+
+TEST(ContextIterator, BasicAssertions)
+{
+    Context ctx;
+
+    ctx.update("keyA", std::string("hello"));
+    ctx.update("keyB", 100);
+    ctx.update("keyC", false);
+
+    ctx.save();
+
+    ctx.update("keyA", std::string("hello, world."));
+
+    for (auto record : ctx)
+    {
+        std::cout << record.name << " (" <<
+                     record.current << ") ";
+
+        if (record.next)
+            std::cout << "[ changed ]";
+
+        std::cout << std::endl;
+    }
+}
