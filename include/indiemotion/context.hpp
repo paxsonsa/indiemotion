@@ -47,11 +47,47 @@ namespace indiemotion
 
         Context();
 
-
+        /**
+         * Stage an update to the given key with the given value
+         *
+         * The change to the key is not saved permanently until
+         * save() is called.
+         *
+         * @param key
+         * @param value
+         */
         void update(std::string key, std::any value);
+
+        /**
+         * Save the current pending changes.
+         *
+         * If no changes are pending, it's a NoOp.
+         *
+         */
         void save();
+
+        /**
+         * Retrieve a revision that is N versions back from the back.
+         *
+         * If the revision request is too far back, an empty revision is
+         * returned.
+         *
+         * @return
+         */
         RevisionView revision(int);
+
+        /**
+         * Rollback the latest revision and return it.
+         *
+         * If there is nothing to rollback, an empty revision view is returned.
+         *
+         * @return the last revision removed.
+         */
         RevisionView rollback();
+
+        /**
+         * Clear any pending changes.
+         */
         void clear_pending();
 
         protected:

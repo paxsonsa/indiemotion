@@ -18,7 +18,10 @@ namespace indiemotion
 
     void Context::save()
     {
-        // TODO: Handle no changes
+        if (_next_rev->empty())
+        {
+            return;
+        }
         auto rev = std::move(_next_rev);
         _next_rev = std::make_shared<Revision>();
         if (!_revisions.empty())
@@ -29,6 +32,8 @@ namespace indiemotion
             }
         }
         _revisions.push_back(std::move(rev));
+        if (_revisions.size() >= 3)
+            _revisions.pop_front();
 
         pending = RevisionView({_next_rev});
         current = RevisionView({_next_rev, _revisions.back()});
