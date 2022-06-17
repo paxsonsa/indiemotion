@@ -15,7 +15,9 @@ class DefaultCallbacks: public GlobalCallbacks
 int main()
 {
 	auto cwd = std::filesystem::current_path();
-        auto runtime = std::make_shared<EmbeddedRuntime>();
+        auto controllers = Engine::default_controllers();
+        auto engine = std::make_shared<Engine>(std::move(controllers));
+        auto runtime = std::make_shared<EmbeddedRuntime>(std::move(engine));
 	auto server = std::make_shared<Server>(runtime);
 	auto config = std::make_shared<ServerConfiguration>();
         auto callbacks = std::make_shared<DefaultCallbacks>();
@@ -24,6 +26,8 @@ int main()
 	config->port = 2255;
 	config->root_path = cwd.string();
         config->callbacks = callbacks;
+
+//        engine->initialize();
 	server->start(config);
 	fmt::print("* * * IndieMotion Standalone Server * * *\n");
 	fmt::print("* * * {} * * *\n", cwd.string());

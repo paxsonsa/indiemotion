@@ -86,6 +86,16 @@ TEST(ContextIterator, BasicAssertions)
     Context ctx;
 
     ctx.update("keyA", std::string("hello"));
+    for (auto record : ctx) {
+        std::cout << record.name << " (" <<
+            record.current << ") ";
+
+        if (record.next)
+            std::cout << "[ changed ]";
+
+        std::cout << std::endl;
+    }
+
     ctx.update("keyB", 100);
     ctx.update("keyC", false);
 

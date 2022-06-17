@@ -12,7 +12,6 @@
 
 namespace indiemotion
 {
-
     struct Context: public std::enable_shared_from_this<Context>
     {
         struct Value {
@@ -79,19 +78,18 @@ namespace indiemotion
                 if (_ctx == nullptr)
                     return;
 
-                if (_ctx->_revisions.empty())
-                    return;
-
-
                 _cur = new KeyEntry{};
                 std::set<std::string> keys;
-                auto rev = _ctx->_revisions.back();
-                for (const auto pair : *rev)
+
+                if (!ctx->_revisions.empty())
                 {
-                    keys.insert(pair.first);
+                    auto rev = _ctx->_revisions.back();
+                    for (const auto pair : *rev) {
+                        keys.insert(pair.first);
+                    }
                 }
 
-                rev = _ctx->_next_rev;
+                auto rev = _ctx->_next_rev;
                 for (const auto pair : *rev)
                 {
                     keys.insert(pair.first);
@@ -137,7 +135,10 @@ namespace indiemotion
             void load_key()
             {
                 if (_idx >= _keys.size())
+                {
                     _cur = nullptr;
+                    return;
+                }
 
                 auto key = _keys[_idx];
                 _cur->name = key;

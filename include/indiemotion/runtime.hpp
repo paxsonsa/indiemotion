@@ -101,6 +101,7 @@ namespace indiemotion {
                         error_message(Error::BadMessage, "client is not registered.")
                     );
                     _leave(conn);
+                    return;
                 } else {
                     // Register Client Information with Connection
                     // - mark connection as registered.
@@ -108,13 +109,11 @@ namespace indiemotion {
                     client_info->name = msg.client_info().name();
                     conn->info = std::move(client_info);
                 }
-                return;
             }
-
             try {
                 _engine->render(std::move(msg));
             }
-            catch (Exception e) {
+            catch (Exception &e) {
                 error_message(e);
             }
 //            try {
